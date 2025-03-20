@@ -2,3 +2,6 @@ pandas
 numpy
 scikit-learn
 seaborn
+nltk
+ipykernel
+jupyter
