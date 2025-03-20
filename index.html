@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save URL Input</title>
+    <style>
+        /* Styling for the gradient line */
+        .gradient-line {
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to right, lightgreen, darkred); /* Green to red gradient */
+            position: relative;
+        }
+
+        /* Styling for the tick (indicator) */
+        .tick {
+            position: absolute;
+            top: -10px;
+            width: 2px;
+            height: 30px;
+            background-color: black; /* Tick color */
+        }
+
+        /* Styling for the overall container */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        #outputData {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Enter a URL</h2>
+        <input type="text" id="urlInput" placeholder="Enter URL here">
+        <button onclick="saveToServer()">Save</button>
+        <p id="responseMessage"></p>
+
+        <h3>Output Data</h3>
+        <p id="outputData"></p>
+
+        <!-- Gradient Line -->
+        <div class="gradient-line" id="gradientLine">
+            <div class="tick" id="tick"></div>
+        </div>
+    </div>
+
+    <script>
+        async function saveToServer() {
+            const url = document.getElementById("urlInput").value;
+            if (url.trim() === "") {
+                alert("Please enter a valid URL");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/save_url", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const result = await response.json();
+                console.log("Server Response:", result); // Debugging
+
+                document.getElementById("responseMessage").innerText = result.message || result.error;
+                fetchOutputData();  // Fetch the output data after saving the URL
+            } catch (error) {
+                console.error("Error sending request:", error);
+            }
+        }
+
+        // Function to fetch the output data
+        async function fetchOutputData() {
+            try {
+                const response = await fetch("http://127.0.0.1:5000/get_output", {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" }
+                });
+                const data = await response.json();
+                
+                // Display the data on the page
+                if (data && data.length > 0) {
+                    const output = data[0];  // Assuming there's only one object in the array
+                    document.getElementById("outputData").innerText =
+                        `Fake Percent: ${output.fake_percent}% (${output.fake_percent_display})`;
+
+                    // Set the position of the tick based on fake_percent
+                    setTickPosition(output.fake_percent);
+                }
+            } catch (error) {
+                console.error("Error fetching output data:", error);
+            }
+        }
+
+        // Function to set the tick position on the line
+        function setTickPosition(fakePercent) {
+            const gradientLine = document.getElementById("gradientLine");
+            const tick = document.getElementById("tick");
+
+            // Calculate the position of the tick based on the fake_percent
+            const position = (fakePercent / 100) * gradientLine.offsetWidth;
+
+            // Set the tick position (this is in pixels)
+            tick.style.left = `${position}px`;
+        }
+    </script>
+</body>
+</html>
