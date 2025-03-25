@@ -32,6 +32,136 @@
         #outputData {
             margin-top: 20px;
         }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Output Cards */
+        .result-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .error-card {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+            color: #d32f2f;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #4CAF50;
+            position: relative;
+        }
+        
+        .metric-card h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .metric-card .tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the element */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }     
+        .metric-card:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }   
+        
+        .metric-card .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        .metric-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #222;
+        }
+        
+        .verdict-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #ffeb3b;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .result-summary {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .result-summary h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .score {
+            color: #2e7d32;
+            font-size: 24px;
+        }
+        
+        .error-card button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -40,13 +170,19 @@
         <input type="text" id="urlInput" placeholder="Enter URL here">
         <button onclick="saveToServer()">Save</button>
         <p id="responseMessage"></p>
-
-        <h3>Output Data</h3>
-        <p id="outputData"></p>
-
-        <!-- Gradient Line -->
-        <div class="gradient-line" id="gradientLine">
-            <div class="tick" id="tick"></div>
+    
+        <!-- Output Section (initially hidden) -->
+        <div id="outputSection" style="display: none;">
+            <h3>Analysis Results</h3>
+            <div id="outputData"></div>
+            
+            <!-- Metrics Grid -->
+            <div class="metrics-grid" id="metricsDisplay"></div>
+            
+            <!-- Gradient Line -->
+            <div class="gradient-line" id="gradientLine">
+                <div class="tick" id="tick"></div>
+            </div>
         </div>
     </div>
 
@@ -57,46 +193,131 @@
                 alert("Please enter a valid URL");
                 return;
             }
-
+        
+            // Show loading state
+            document.getElementById("responseMessage").innerText = `Analyzing: ${url}`;
+            document.getElementById("outputSection").style.display = "none"; // Hide output
+            
+            // Show loading spinner (add this element if you don't have it)
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            document.getElementById("responseMessage").appendChild(spinner);
+        
             try {
-                const response = await fetch("http://127.0.0.1:5000/save_url", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ url: url })
-                });
-
+                // Start both the API call and 5-second timer simultaneously
+                const [response] = await Promise.all([
+                    fetch("http://127.0.0.1:5000/save_url", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ url: url })
+                    }),
+                    new Promise(resolve => setTimeout(resolve, 5000))
+                ]);
+        
                 const result = await response.json();
-                console.log("Server Response:", result); // Debugging
-
-                document.getElementById("responseMessage").innerText = result.message || result.error;
-                fetchOutputData();  // Fetch the output data after saving the URL
+                document.getElementById("responseMessage").innerText = `Analysis complete for: ${url}`;
+                
+                // Show output section
+                document.getElementById("outputSection").style.display = "block";
+                fetchOutputData();
+        
             } catch (error) {
-                console.error("Error sending request:", error);
+                document.getElementById("responseMessage").innerText = `Error analyzing URL: ${error.message}`;
+            } finally {
+                // Remove spinner
+                const spinner = document.querySelector('.loading-spinner');
+                if (spinner) spinner.remove();
             }
         }
-
-        // Function to fetch the output data
+        
         async function fetchOutputData() {
             try {
-                const response = await fetch("http://127.0.0.1:5000/get_output", {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" }
-                });
+                const response = await fetch("http://127.0.0.1:5000/get_output");
                 const data = await response.json();
                 
-                // Display the data on the page
-                if (data && data.length > 0) {
-                    const output = data[0];  // Assuming there's only one object in the array
-                    document.getElementById("outputData").innerText =
-                        `Fake Percent: ${output.fake_percent}% (${output.fake_percent_display})`;
-
-                    // Set the position of the tick based on fake_percent
-                    setTickPosition(output.fake_percent);
-                }
+                if (!response.ok) throw new Error(data.error || "Server error");
+                if (!data || !data.length) throw new Error("No data available");
+        
+                const result = data[0];
+                const tooltips = {
+                    "Avg. Polarity": "Measures overall positive/negative sentiment (-1 = negative, 1 = positive)",
+                    "Avg. Subjectivity": "0 = factual, 1 = opinionated",
+                    "Polarity Score": "Strength of sentiment (higher = more intense)",
+                    "Subjectivity Score": "How opinionated the content is",
+                    "Quotes Count": "Number of cited sources or quotes",
+                    "Word Count": "Total length of the content",
+                    "Readability Score": "0-100 (higher = easier to read)",
+                    "Last Analyzed": "When this analysis was performed"
+                };                
+                // 1. Set the tick position first
+                setTickPosition(result.fake_percent);
+                
+                // 2. Create main output display
+                document.getElementById("outputData").innerHTML = `
+                    <div class="result-summary">
+                        <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
+                            <span class="verdict-badge">${result.fake_percent_display}</span>
+                        </h3>
+                        <p>Confidence: ${(result.confidence * 100).toFixed(0)}%</p>
+                    </div>
+                `;
+                
+                // 3. Create metrics grid
+                document.getElementById("metricsDisplay").innerHTML = `
+                    <div class="metric-card">
+                        <h4>Avg. Polarity</h4>
+                        <div class="metric-value">${result.avg_polarity}</div>
+                        <span class="tooltip">Measures overall sentiment (-1 to 1 where 0 is neutral)</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Avg. Subjectivity</h4>
+                        <div class="metric-value">${result.avg_subjectivity}</div>
+                        <span class="tooltip">0 = factual, 1 = opinionated</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Polarity Score</h4>
+                        <div class="metric-value">${result.polarity_score}</div>
+                        <span class="tooltip">Strength of emotional tone</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Subjectivity Score</h4>
+                        <div class="metric-value">${result.subjectivity_score}</div>
+                        <span class="tooltip">How opinionated vs factual the content is</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Quotes Count</h4>
+                        <div class="metric-value">${result.num_quotes}</div>
+                        <span class="tooltip">Number of external sources cited</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Word Count</h4>
+                        <div class="metric-value">${result.word_count}</div>
+                        <span class="tooltip">Total length of the analyzed content</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Readability</h4>
+                        <div class="metric-value">${result.flesch_reading_ease}</div>
+                        <span class="tooltip">0-100 scale (higher = easier to read)</span>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Last Analyzed</h4>
+                        <div class="metric-value">${new Date(result.last_updated).toLocaleString()}</div>
+                        <span class="tooltip">When this analysis was performed</span>
+                    </div>
+                `;
+                
             } catch (error) {
-                console.error("Error fetching output data:", error);
+                document.getElementById("outputData").innerHTML = `
+                    <div class="error-card">
+                        <h3>Error Loading Results</h3>
+                        <p>${error.message}</p>
+                        <button onclick="fetchOutputData()">Retry</button>
+                    </div>
+                `;
             }
         }
+
+
 
         // Function to set the tick position on the line
         function setTickPosition(fakePercent) {
