@@ -8,9 +8,11 @@ from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 
 # Load your dataset (update the file path as needed)
-data = pd.read_csv("data/final_dataset.csv")
+data = pd.read_csv(f"data/final_dataset_3_24_25.csv", low_memory=False)
 
 # Convert the target column to numeric, setting invalid parsing as NaN
+# Effectively this gets rid of rows where the target column is not numeric
+# In some cases the target column was text from the article, or other invalid data
 data['label'] = pd.to_numeric(data['label'], errors='coerce')
 
 # Drop rows where the conversion failed (i.e., where target_numeric is NaN)

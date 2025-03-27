@@ -6,3 +6,4 @@ nltk
 ipykernel
 jupyter
 textstat
+wordcloud
