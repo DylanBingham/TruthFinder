@@ -7,3 +7,5 @@ ipykernel
 jupyter
 textstat
 wordcloud
+flask
+flask-cors
