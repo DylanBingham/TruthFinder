@@ -1,10 +1,41 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import os
-import json
+from utils import (
+    extract_features
+)
+
 import datetime
+import json
+import os
+
+
 app = Flask(__name__)
 CORS(app)
+
+# Sample dictionary of articles. You can map either titles or URLs to article text.
+articles = {
+    "sample_article": "This is the sample article text to be processed by the feature extraction functions.",
+    "https://example.com/article1": "Another article text with some different content."
+}
+
+# Define a route to extract features for an article specified by title or URL
+@app.route('/extract_features', methods=['POST'])
+def extract_features_route():
+    data = request.get_json()
+    article_title = data.get("article_title")
+    url = data.get("url")
+    
+    # Lookup the article text using the provided article_title or url
+    if article_title and article_title in articles:
+        article_text = articles[article_title]
+    elif url and url in articles:
+        article_text = articles[url]
+    else:
+        return jsonify({"error": "Article not found."}), 404
+
+    # Extract features from the article text
+    features = extract_features(article_text)
+    return jsonify(features)
 
 # Serve index.html at the root URL
 @app.route('/')
