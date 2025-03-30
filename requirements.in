@@ -4,3 +4,7 @@ scikit-learn
 seaborn
 ipykernel
 jupyter
+nltk
+textblob
+scipy
+goose3 # for live article extraction from a URL
