@@ -78,20 +78,20 @@ def get_num_speech_attributes(text):
     text = text.lower()
     return text.count("said") + text.count("say") + text.count("told") + text.count("tell")
 
-# Master function to extract all features from an article
-def extract_features(article_text):
+# Master function to extract all features from a user uploaded article
+def extract_features_from_article(article_text):
     # Clean the text and get tokens
     cleaned_text, tokens = clean_text(article_text, lower_text=True, remove_whitespace=True, fix_encoding=True, tokenize=True)
     
-    # Compute TF-IDF features on the cleaned text
-    tfidf_vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
-    tfidf_matrix = tfidf_vectorizer.fit_transform([cleaned_text])
-    tfidf_values = tfidf_matrix.toarray()[0]
-    tfidf_features = {f"tfidf_{term}": tfidf_values[i] 
-                      for i, term in enumerate(tfidf_vectorizer.get_feature_names_out())}
+    # # Compute TF-IDF features on the cleaned text
+    # tfidf_vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
+    # tfidf_matrix = tfidf_vectorizer.fit_transform([cleaned_text])
+    # tfidf_values = tfidf_matrix.toarray()[0]
+    # tfidf_features = {f"tfidf_{term}": tfidf_values[i]
+    #                   for i, term in enumerate(tfidf_vectorizer.get_feature_names_out())}
     
     
-    # Extract other features from the original article text (to preserve punctuation/sentence structure)
+    # Extract other features from the slightly cleaned original article text (to preserve punctuation/sentence structure)
     article_text_cleaned, _ = clean_text(article_text)
     reading_ease_score = textstat.flesch_reading_ease(article_text_cleaned)
 
@@ -107,7 +107,7 @@ def extract_features(article_text):
     
     # Combine all features into one dictionary
     features = {}
-    features.update(tfidf_features)
+    # features.update(tfidf_features)
     features["flesch_reading_ease"] = reading_ease_score
     features["word_count"] = article_text_cleaned_word_count
     features["overall_polarity"] = overall_polarity
