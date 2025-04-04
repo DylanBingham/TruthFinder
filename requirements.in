@@ -6,6 +6,7 @@ nltk
 ipykernel
 jupyter
 textstat
+textblob
 wordcloud
 flask
 flask-cors
