@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Save URL Input</title>
+<<<<<<< HEAD
+    <script src="/static/flesch_reading_ease_chart.js"></script>
+    <script src="/static/word_count_chart.js"></script>
+    <script src="/static/overall_polarity_chart.js"></script>
+    <script src="/static/overall_subjectivity_chart.js"></script>
+    <script src="/static/avg_sentence_polarity_chart.js"></script>
+    <script src="/static/avg_sentence_subjectivity_chart.js"></script>
+    <script src="/static/num_speech_attributes_chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="/static/avg_polarity_style.css">
+=======
+>>>>>>> origin/dev
     <style>
         /* Styling for the gradient line */
         .gradient-line {
@@ -162,9 +174,90 @@
             cursor: pointer;
             margin-top: 10px;
         }
+<<<<<<< HEAD
+        
+        .chart-container {
+            width: 800px;
+            height: 400px;
+            margin: 40px auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background: white;
+        }
+        .axis-label {
+            font-size: 14px;
+            font-family: sans-serif;
+        }
+        .chart-title {
+            font-size: 18px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+        .bar {
+            fill: steelblue;
+            fill-opacity: 0.7;
+            stroke: black;
+            stroke-width: 0.5;
+        }
+        .kde-line {
+            fill: none;
+            stroke: red;
+            stroke-width: 2;
+            display: none
+        }
+        body {
+            background-color: #f5f5f5;
+            font-family: sans-serif;
+        }
+        
+        .vertical-line {
+            stroke: #FF5733;
+            stroke-width: 4;
+            stroke-dasharray: 5,5;
+            transition: stroke 0.2s, stroke-width 0.2s;
+        }
+        
+        .vertical-line:hover {
+            stroke: #FF0000;
+            stroke-width: 6;
+        }
+        
+        .vertical-line-label {
+            font-size: 12px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+        
+        .chart-tooltip text {
+            fill: #333;
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+        
+        .chart-tooltip rect {
+            fill: white !important;
+            stroke: #333;
+            stroke-width: 1px;
+            rx: 5px;
+            ry: 5px;
+        }      
+        svg {
+            overflow: visible;
+        }
+        
+        /* Make sure tooltips appear above other elements */
+        .chart-tooltip {
+            z-index: 100;
+            pointer-events: none;
+        }        
+       
     </style>
 </head>
 <body>
+
+
     <div class="container">
         <h2>Select an Article to be Analyzed</h2>
         <select id="urlInput">
@@ -173,6 +266,14 @@
             <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral">MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral</option>
             <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral">MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral</option>
         </select>
+=======
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Enter a URL</h2>
+        <input type="text" id="urlInput" placeholder="Enter URL here">
+>>>>>>> origin/dev
         <button onclick="saveToServer()">Save</button>
         <p id="responseMessage"></p>
     
@@ -183,15 +284,23 @@
             
             <!-- Metrics Grid -->
             <div class="metrics-grid" id="metricsDisplay"></div>
+<<<<<<< HEAD
+=======
             
             <!-- Gradient Line -->
             <div class="gradient-line" id="gradientLine">
                 <div class="tick" id="tick"></div>
             </div>
+>>>>>>> origin/dev
         </div>
     </div>
 
     <script>
+<<<<<<< HEAD
+    
+    
+=======
+>>>>>>> origin/dev
         async function saveToServer() {
             const url = document.getElementById("urlInput").value;
             if (url.trim() === "") {
@@ -254,8 +363,12 @@
                     "Readability Score": "0-100 (higher = easier to read)",
                     "Last Analyzed": "When this analysis was performed"
                 };                
+<<<<<<< HEAD
+
+=======
                 // 1. Set the tick position first
                 setTickPosition(result.fake_percent);
+>>>>>>> origin/dev
                 
                 // 2. Create main output display
                 document.getElementById("outputData").innerHTML = `
@@ -263,15 +376,166 @@
                         <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
                             <span class="verdict-badge">${result.fake_percent_display}</span>
                         </h3>
+<<<<<<< HEAD
+                        <p>Confidence: ${(result.confidence * 1).toFixed(0)}%</p>
+                        <!-- Gradient Line moved inside result-summary -->
+                        <div class="gradient-line" id="gradientLine">
+                            <div class="tick" id="tick"></div>
+                        </div>
+                    </div>
+                `;
+                
+                // 1. Set the tick position first
+                setTickPosition(result.fake_percent);
+       
+                d3.csv("/static/final_dataset_with_pca_d3.csv").then(data => {
+                    createFleschReadingEaseChart(data,result.flesch_reading_ease);
+                    createWordCountChart(data,result.word_count);
+                    createOverallPolarityChart(data,result.polarity_score);
+                    createOverallSubjectivityChart(data,result.subjectivity_score);
+                    createAvgSentencePolarityChart(data,result.avg_polarity);
+                    createAvgSentenceSubjectivityChart(data,result.avg_subjectivity);
+                    createNumSpeechAttributesChart(data,result.num_quotes);
+                }).catch(error => {
+                    console.error("Error loading the data:", error);
+                });                
+                
+          
+=======
                         <p>Confidence: ${(result.confidence * 100).toFixed(0)}%</p>
                     </div>
                 `;
                 
+>>>>>>> origin/dev
                 // 3. Create metrics grid
                 document.getElementById("metricsDisplay").innerHTML = `
                     <div class="metric-card">
                         <h4>Avg. Polarity</h4>
                         <div class="metric-value">${result.avg_polarity}</div>
+<<<<<<< HEAD
+                        <div id="avg-sentence-polarity-chart" class="chart-container">
+                            <!-- Scale container -->
+                            <div class="polarity-scale">
+                                <!-- The scale track -->
+                                <div class="scale-track"></div>
+                                
+                                <!-- The indicator for the current value -->
+                                <div class="scale-indicator" style="left: ${result.avg_polarity * 100}%;">
+                                    <div class="indicator-line"></div>
+                                    <div class="indicator-dot"></div>
+                                </div>
+                                
+                                <!-- Scale labels with tooltips -->
+                                <div class="scale-label scale-label-0" data-tooltip="Completely negative sentiment">
+                                    0
+                                </div>
+                                <div class="scale-label scale-label-1" data-tooltip="Completely positive sentiment">
+                                    1
+                                </div>
+                                <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                            </div>
+                        </div>
+                        <span class="tooltip">Measures overall sentiment (0 to 1 where 0.5 is neutral)</span>
+                    </div>
+                                        
+                    
+                    
+                    <div class="metric-card">
+                        <h4>Avg. Subjectivity</h4>
+                        <div class="metric-value">${result.avg_subjectivity}</div>
+                        <div id="avg-sentence-subjectivity-chart" class="chart-container">
+                            <!-- Scale container -->
+                            <div class="subjectivity-scale">
+                                <!-- The scale track - blue gradient for objectivity/subjectivity -->
+                                <div class="scale-track"></div>
+                                
+                                <!-- The indicator for the current value -->
+                                <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
+                                    <div class="indicator-line"></div>
+                                    <div class="indicator-dot"></div>
+                                </div>
+                                
+                                <!-- Scale labels with tooltips -->
+                                <div class="scale-label scale-label-0" data-tooltip="Factual content (objective statements)">
+                                    0
+                                </div>
+                                <div class="scale-label scale-label-1" data-tooltip="Opinionated content (subjective statements)">
+                                    1
+                                </div>
+                                <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                            </div>
+                        </div>
+                        <span class="tooltip">0 = factual, 1 = opinionated</span>
+                    </div>
+                    
+                    
+                    <div class="metric-card">
+                        <h4>Polarity Score</h4>
+                        <div class="metric-value">${result.polarity_score}</div>
+                        <div id="overall-polarity-chart" class="chart-container">
+                            <!-- Scale container -->
+                            <div class="polarity-score-scale">
+                                <!-- The scale track - bidirectional gradient -->
+                                <div class="scale-track"></div>
+                                
+                                <!-- The indicator -->
+                                <div class="scale-indicator" style="left: ${(result.polarity_score + 1) * 50}%;">
+                                    <div class="indicator-line"></div>
+                                    <div class="indicator-dot"></div>
+                                </div>
+                                
+                                <!-- Scale labels with tooltips -->
+                                <div class="scale-label scale-label-neg" data-tooltip="Strong negative sentiment">
+                                    -1
+                                </div>
+                                <div class="scale-label scale-label-neutral" data-tooltip="Neutral sentiment">
+                                    0
+                                </div>
+                                <div class="scale-label scale-label-pos" data-tooltip="Strong positive sentiment">
+                                    1
+                                </div>
+                                <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                            </div>
+                        </div>
+                        <span class="tooltip">Strength of emotional tone (-1 to 1)</span>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <h4>Subjectivity Score</h4>
+                        <div class="metric-value">${result.subjectivity_score}</div>
+                        <div id="overall-subjectivity-chart" class="chart-container">
+                            <!-- Scale container -->
+                            <div class="subjectivity-score-scale">
+                                <!-- The scale track - blue gradient -->
+                                <div class="scale-track"></div>
+                                
+                                <!-- The indicator -->
+                                <div class="scale-indicator" style="left: ${result.subjectivity_score * 100}%;">
+                                    <div class="indicator-line"></div>
+                                    <div class="indicator-dot"></div>
+                                </div>
+                                
+                                <!-- Scale labels with tooltips -->
+                                <div class="scale-label scale-label-min" data-tooltip="Objective: Fact-based, neutral language">
+                                    0
+                                </div>
+                                <div class="scale-label scale-label-mid" data-tooltip="Balanced mix of facts and opinions">
+                                    0.5
+                                </div>
+                                <div class="scale-label scale-label-max" data-tooltip="Subjective: Personal opinions, emotional language">
+                                    1
+                                </div>
+                                <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                            </div>
+                        </div>
+                        <span class="tooltip">How opinionated vs factual the content is (0-1 scale)</span>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <h4>Quotes Count</h4>
+                        <div class="metric-value">${result.num_quotes}</div>
+                        <div id="num-speech-attributes-chart" class="chart-container"></div>
+=======
                         <span class="tooltip">Measures overall sentiment (-1 to 1 where 0 is neutral)</span>
                     </div>
                     <div class="metric-card">
@@ -292,16 +556,54 @@
                     <div class="metric-card">
                         <h4>Quotes Count</h4>
                         <div class="metric-value">${result.num_quotes}</div>
+>>>>>>> origin/dev
                         <span class="tooltip">Number of external sources cited</span>
                     </div>
                     <div class="metric-card">
                         <h4>Word Count</h4>
                         <div class="metric-value">${result.word_count}</div>
+<<<<<<< HEAD
+                        <div id="word-count-chart" class="chart-container"></div>
+=======
+>>>>>>> origin/dev
                         <span class="tooltip">Total length of the analyzed content</span>
                     </div>
                     <div class="metric-card">
                         <h4>Readability</h4>
                         <div class="metric-value">${result.flesch_reading_ease}</div>
+<<<<<<< HEAD
+                        <div id="flesch-reading-ease-chart" class="chart-container">
+                            <!-- Readability scale with difficulty zones -->
+                            <div class="readability-scale">
+                                <!-- Multi-color gradient for difficulty levels -->
+                                <div class="scale-track"></div>
+                                
+                                <!-- Indicator -->
+                                <div class="scale-indicator" style="left: ${result.flesch_reading_ease}%;">
+                                    <div class="indicator-line"></div>
+                                    <div class="indicator-dot"></div>
+                                </div>
+                                
+                                <!-- Zone markers -->
+                                <div class="zone-marker" style="left: 30%;" data-tooltip="College level"></div>
+                                <div class="zone-marker" style="left: 50%;" data-tooltip="High school"></div>
+                                <div class="zone-marker" style="left: 70%;" data-tooltip="8th grade"></div>
+                                <div class="zone-marker" style="left: 90%;" data-tooltip="5th grade"></div>
+                                
+                                <!-- Scale labels -->
+                                <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                                    0
+                                </div>
+                                <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
+                                    100
+                                </div>
+                                <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                            </div>
+                        </div>
+                        <span class="tooltip">0-100 scale (higher = easier to read)</span>
+                    </div>
+
+=======
                         <span class="tooltip">0-100 scale (higher = easier to read)</span>
                     </div>
                     <div class="metric-card">
@@ -309,6 +611,7 @@
                         <div class="metric-value">${new Date(result.last_updated).toLocaleString()}</div>
                         <span class="tooltip">When this analysis was performed</span>
                     </div>
+>>>>>>> origin/dev
                 `;
                 
             } catch (error) {
@@ -323,7 +626,10 @@
         }
 
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/dev
         // Function to set the tick position on the line
         function setTickPosition(fakePercent) {
             const gradientLine = document.getElementById("gradientLine");
