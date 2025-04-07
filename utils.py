@@ -135,9 +135,9 @@ def extract_features_from_article(article_text):
     feature_vector = np.array(feature_vector).reshape(1, -1)
     
     # 6. Use the RF model to generate a prediction
-    prediction = rf_model.predict(feature_vector)
+    prediction = rf_model.predict_proba(feature_vector)
     
-    return features, prediction[0] 
+    return features, prediction[0,1]
 
 # Example usage, uncomment and pass one of the articles to test the function:
 # article = "This is an example article. It includes numbers like 123, punctuation, and multiple sentences."
