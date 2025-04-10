@@ -7,25 +7,18 @@ import numpy as np
 import pandas as pd
 import nltk
 import re
-<<<<<<< HEAD
 import pickle
-=======
->>>>>>> origin/dev
 import textstat
 import string
 import unicodedata
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/dev
 ######## App Configuration and Setup #########
 # Download necessary NLTK resources
 nltk.download('punkt_tab')
 # Load the pre-fitted models (adjust the file paths as needed)
 tfidf_vectorizer = joblib.load('tfidf_vectorizer.joblib')
 pca_model = joblib.load('pca_model.joblib')
-<<<<<<< HEAD
 rf_model = joblib.load('best_rf_model.pkl') # Update as needed per your project structure
 ##############################################
 def setup_input_articles():
@@ -58,10 +51,6 @@ def setup_input_articles():
         
     return
     
-=======
-rf_model = joblib.load('data/best_rf_model.pkl') # Update as needed per your project structure
-##############################################
->>>>>>> origin/dev
 
 # Define function to clean text
 def clean_text(text, lower_text: bool = False, remove_whitespace: bool = False, fix_encoding: bool = True, tokenize: bool = False):
@@ -177,14 +166,11 @@ def extract_features_from_article(article_text):
     feature_vector = [features[col] for col in feature_order]
     feature_vector = np.array(feature_vector).reshape(1, -1)
     
-<<<<<<< HEAD
     #Notes from Kevin: Vedant The next step I need you to do is transform the data from prediction to 
     # the front end. Use examples of how I get the features to appear on the front end
     # and take the same approach. Right now the global_resp_data variable in app.py has static numbers for outputs
     
     
-=======
->>>>>>> origin/dev
     # 6. Use the RF model to generate a prediction
     prediction = rf_model.predict_proba(feature_vector)
     

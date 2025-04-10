@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Save URL Input</title>
-<<<<<<< HEAD
     <script src="/static/flesch_reading_ease_chart.js"></script>
     <script src="/static/word_count_chart.js"></script>
     <script src="/static/overall_polarity_chart.js"></script>
@@ -14,8 +13,6 @@
     <script src="/static/num_speech_attributes_chart.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="/static/avg_polarity_style.css">
-=======
->>>>>>> origin/dev
     <style>
         /* Styling for the gradient line */
         .gradient-line {
@@ -174,7 +171,6 @@
             cursor: pointer;
             margin-top: 10px;
         }
-<<<<<<< HEAD
         
         .chart-container {
             width: 800px;
@@ -266,14 +262,6 @@
             <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral">MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral</option>
             <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral">MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral</option>
         </select>
-=======
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Enter a URL</h2>
-        <input type="text" id="urlInput" placeholder="Enter URL here">
->>>>>>> origin/dev
         <button onclick="saveToServer()">Save</button>
         <p id="responseMessage"></p>
     
@@ -284,23 +272,12 @@
             
             <!-- Metrics Grid -->
             <div class="metrics-grid" id="metricsDisplay"></div>
-<<<<<<< HEAD
-=======
-            
-            <!-- Gradient Line -->
-            <div class="gradient-line" id="gradientLine">
-                <div class="tick" id="tick"></div>
-            </div>
->>>>>>> origin/dev
         </div>
     </div>
 
     <script>
-<<<<<<< HEAD
     
     
-=======
->>>>>>> origin/dev
         async function saveToServer() {
             const url = document.getElementById("urlInput").value;
             if (url.trim() === "") {
@@ -363,12 +340,7 @@
                     "Readability Score": "0-100 (higher = easier to read)",
                     "Last Analyzed": "When this analysis was performed"
                 };                
-<<<<<<< HEAD
 
-=======
-                // 1. Set the tick position first
-                setTickPosition(result.fake_percent);
->>>>>>> origin/dev
                 
                 // 2. Create main output display
                 document.getElementById("outputData").innerHTML = `
@@ -376,7 +348,6 @@
                         <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
                             <span class="verdict-badge">${result.fake_percent_display}</span>
                         </h3>
-<<<<<<< HEAD
                         <p>Confidence: ${(result.confidence * 1).toFixed(0)}%</p>
                         <!-- Gradient Line moved inside result-summary -->
                         <div class="gradient-line" id="gradientLine">
@@ -401,18 +372,11 @@
                 });                
                 
           
-=======
-                        <p>Confidence: ${(result.confidence * 100).toFixed(0)}%</p>
-                    </div>
-                `;
-                
->>>>>>> origin/dev
                 // 3. Create metrics grid
                 document.getElementById("metricsDisplay").innerHTML = `
                     <div class="metric-card">
                         <h4>Avg. Polarity</h4>
                         <div class="metric-value">${result.avg_polarity}</div>
-<<<<<<< HEAD
                         <div id="avg-sentence-polarity-chart" class="chart-container">
                             <!-- Scale container -->
                             <div class="polarity-scale">
@@ -535,43 +499,17 @@
                         <h4>Quotes Count</h4>
                         <div class="metric-value">${result.num_quotes}</div>
                         <div id="num-speech-attributes-chart" class="chart-container"></div>
-=======
-                        <span class="tooltip">Measures overall sentiment (-1 to 1 where 0 is neutral)</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Avg. Subjectivity</h4>
-                        <div class="metric-value">${result.avg_subjectivity}</div>
-                        <span class="tooltip">0 = factual, 1 = opinionated</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Polarity Score</h4>
-                        <div class="metric-value">${result.polarity_score}</div>
-                        <span class="tooltip">Strength of emotional tone</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Subjectivity Score</h4>
-                        <div class="metric-value">${result.subjectivity_score}</div>
-                        <span class="tooltip">How opinionated vs factual the content is</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Quotes Count</h4>
-                        <div class="metric-value">${result.num_quotes}</div>
->>>>>>> origin/dev
                         <span class="tooltip">Number of external sources cited</span>
                     </div>
                     <div class="metric-card">
                         <h4>Word Count</h4>
                         <div class="metric-value">${result.word_count}</div>
-<<<<<<< HEAD
                         <div id="word-count-chart" class="chart-container"></div>
-=======
->>>>>>> origin/dev
                         <span class="tooltip">Total length of the analyzed content</span>
                     </div>
                     <div class="metric-card">
                         <h4>Readability</h4>
                         <div class="metric-value">${result.flesch_reading_ease}</div>
-<<<<<<< HEAD
                         <div id="flesch-reading-ease-chart" class="chart-container">
                             <!-- Readability scale with difficulty zones -->
                             <div class="readability-scale">
@@ -603,15 +541,6 @@
                         <span class="tooltip">0-100 scale (higher = easier to read)</span>
                     </div>
 
-=======
-                        <span class="tooltip">0-100 scale (higher = easier to read)</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Last Analyzed</h4>
-                        <div class="metric-value">${new Date(result.last_updated).toLocaleString()}</div>
-                        <span class="tooltip">When this analysis was performed</span>
-                    </div>
->>>>>>> origin/dev
                 `;
                 
             } catch (error) {
@@ -626,10 +555,6 @@
         }
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/dev
         // Function to set the tick position on the line
         function setTickPosition(fakePercent) {
             const gradientLine = document.getElementById("gradientLine");

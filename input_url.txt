@@ -1,5 +1,1 @@
-<<<<<<< HEAD
 c
-=======
-testtttingggg
->>>>>>> origin/dev
