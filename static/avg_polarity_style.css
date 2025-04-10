@@ -1,10 +1,12 @@
 /* polarity-scale.css */
 .polarity-scale {
-    position: relative;
-    height: 40px;
-    margin: 20px 0;
+  position: relative; /* Keeps it in document flow */
+  z-index: 2; /* Renders above the chart */
+  margin-bottom: 20px; /* Space between scale and chart */
+  background: rgba(255,255,255,0.8); /* Optional: makes scale more readable */
+  padding: 10px;
+  border-radius: 8px;
 }
-
 .scale-track {
     position: absolute;
     top: 20px;
@@ -45,6 +47,7 @@
     cursor: pointer;
     padding: 2px 5px;
     border-radius: 3px;
+    z-index:1000;
     transition: background 0.2s;
 }
 
@@ -322,6 +325,7 @@
 
 .subjectivity-score-scale .scale-label-min {
     left: 0;
+    z-index: 10000;
 }
 
 .subjectivity-score-scale .scale-label-mid {
@@ -331,6 +335,7 @@
 
 .subjectivity-score-scale .scale-label-max {
     right: 0;
+    z-index: 10000;
 }
 
 /* Tooltip styling */
@@ -432,10 +437,13 @@
 
 .readability-scale .scale-label-min {
     left: 0;
+    z-index: 10000;
 }
 
 .readability-scale .scale-label-max {
     right: 0;
+    z-index: 10000;
+     
 }
 
 /* Tooltips */
@@ -475,4 +483,10 @@
     color: #666;
     margin-top: 8px;
     font-style: italic;
+}
+
+#avg-sentence-polarity-chart svg {
+  position: relative;
+  z-index: 1;
+  margin-top: -40px; /* Pulls chart up to meet scale */
 }

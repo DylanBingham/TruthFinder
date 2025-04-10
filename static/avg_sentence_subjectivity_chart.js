@@ -1,32 +1,40 @@
-function createAvgSentenceSubjectivityChart(data,verticalLinePosition) {
-    // Configuration
+function createAvgSentenceSubjectivityChart(data, verticalLinePosition) {
+    // Get the container dimensions first
+    const container = d3.select("#avg-sentence-subjectivity-chart .chart-svg-container");
+    const containerWidth = container.node().getBoundingClientRect().width;
+    const containerHeight = 300;
+
+    // Clear any existing content
+    container.html("");
+
+    // Configuration - now based on container dimensions
     const config = {
-        width: 700,
-        height: 300,
-        margin: { top: 40, right: 30, bottom: 50, left: 50 },
-        numBins: 50,
-        kdePoints: 1000,
+        width: containerWidth - 40, // Account for padding
+        height: containerHeight - 40,
+        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        numBins: 30, // Reduced number of bins for smaller containers
+        kdePoints: 500,
         verticalLine: {
             position: verticalLinePosition,
             color: "#FF5733",
             strokeWidth: 2,
             strokeDasharray: "5,5",
-            hoverColor: "#FF0000"  // Brighter color on hover
+            hoverColor: "#FF0000"
         }
     };
 
     // Filter and parse data
     const filteredData = data.map(d => +d.avg_sentence_subjectivity).filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
-    // Create container div
-    const container = d3.select("#avg-sentence-subjectivity-chart");
     
-    // Create SVG
+    // Create SVG - now fits container exactly
     const svg = container.append("svg")
         .attr("width", config.width + config.margin.left + config.margin.right)
         .attr("height", config.height + config.margin.top + config.margin.bottom)
         .append("g")
         .attr("transform", `translate(${config.margin.left},${config.margin.top})`);
+        
+    // Create defs if they don't exist
     if (svg.select("defs").empty()) {
         const defs = svg.append("defs");
         
@@ -37,7 +45,7 @@ function createAvgSentenceSubjectivityChart(data,verticalLinePosition) {
             .attr("width", "120%")
             .append("feGaussianBlur")
             .attr("in", "SourceAlpha")
-            .attr("stdDeviation", "1")  // Reduced from 2 to 1
+            .attr("stdDeviation", "1")
             .attr("result", "blur");
         
         // Clip path to prevent tooltip from being cut off
@@ -46,10 +54,11 @@ function createAvgSentenceSubjectivityChart(data,verticalLinePosition) {
             .append("rect")
             .attr("width", config.width)
             .attr("height", config.height);
-    }    
-    // Set up scales
+    }
+    
+    // Set up scales with fixed domain for subjectivity (0 to 1)
     const x = d3.scaleLinear()
-        .domain([d3.min(filteredData), d3.max(filteredData)])
+        .domain([0, 1]) // Explicit domain for subjectivity
         .range([0, config.width]);
     
     // Create histogram generator
@@ -65,17 +74,18 @@ function createAvgSentenceSubjectivityChart(data,verticalLinePosition) {
         .domain([0, d3.max(bins, d => d.length / filteredData.length)])
         .range([config.height, 0]);
     
-    // Create bars
+    // Create bars with explicit styling
     svg.selectAll("rect")
         .data(bins)
         .enter().append("rect")
-        .attr("class", "bar")
         .attr("x", d => x(d.x0) + 1)
         .attr("y", d => y(d.length / filteredData.length))
         .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-        .attr("height", d => config.height - y(d.length / filteredData.length));
+        .attr("height", d => config.height - y(d.length / filteredData.length))
+        .attr("fill", "#4e79a7") // Distinct blue color
+        .attr("opacity", 0.7);
     
-    // Create KDE line
+    // Create KDE line with explicit styling
     const kde = kernelDensityEstimator(kernelEpanechnikov(0.5), x.ticks(config.kdePoints));
     const kdeData = kde(filteredData);
     
@@ -85,31 +95,29 @@ function createAvgSentenceSubjectivityChart(data,verticalLinePosition) {
     
     svg.append("path")
         .datum(kdeData)
-        .attr("class", "kde-line")
-        .attr("d", line);
+        .attr("d", line)
+        .attr("fill", "none")
+        .attr("stroke", "#e15759") // Distinct red color
+        .attr("stroke-width", 2);
     
     // Add vertical line at specified position
     if (config.verticalLine.position !== null && !isNaN(config.verticalLine.position)) {
-        // Calculate percentile
         const calculatePercentile = (value) => {
             let countBelow = 0;
             for (let i = 0; i < filteredData.length; i++) {
                 if (filteredData[i] <= value) countBelow++;
-                else break;  // Data is sorted, so we can break early
+                else break;
             }
             return (countBelow / filteredData.length * 100).toFixed(1);
         };
         
         const percentile = calculatePercentile(config.verticalLine.position);
         
-        // Create a group for the vertical line and its tooltip
-       // Create a group for the vertical line and its tooltip
         const verticalLineGroup = svg.append("g")
             .attr("class", "vertical-line-group");
 
-        // Add the vertical line
+        // Vertical line
         const vLine = verticalLineGroup.append("line")
-            .attr("class", "vertical-line")
             .attr("x1", x(config.verticalLine.position))
             .attr("x2", x(config.verticalLine.position))
             .attr("y1", 0)
@@ -118,95 +126,49 @@ function createAvgSentenceSubjectivityChart(data,verticalLinePosition) {
             .attr("stroke-width", config.verticalLine.strokeWidth)
             .attr("stroke-dasharray", config.verticalLine.strokeDasharray);
 
-        // Create tooltip group (initially hidden)
-        const tooltip = svg.append("g")
-            .attr("class", "simple-tooltip")
-            .style("opacity", 0);
-        
-        // Add white background rectangle
-        tooltip.append("rect")
-            .attr("rx", 4)  // Slightly rounded corners
-            .attr("ry", 4)
-            .attr("fill", "white")
-            .attr("stroke", "#ccc")  // Light gray border
-            .attr("stroke-width", 1);
-        
-        // Add text
-        tooltip.append("text")
-            .attr("text-anchor", "middle")
-            .attr("dy", "0.35em")
-            .style("font-size", "12px")
-            .style("fill", "#333");  // Dark gray text
-        
-        // Update hover interactions
+        // Simplified tooltip
         vLine.on("mouseover", function(event) {
             const [_, mouseY] = d3.pointer(event, this);
-            const lineX = x(config.verticalLine.position);
             
-            // Update text
-            tooltip.select("text")
-                .text(`${percentile}% of values < ${verticalLinePosition}`);
-            
-            // Get text size
-            const textSize = tooltip.select("text").node().getBBox();
-            const padding = 8;
-            
-            // Position tooltip
-            tooltip.attr("transform", `translate(${lineX},${mouseY - 30})`);
-            
-            // Size background to fit text
-            tooltip.select("rect")
-                .attr("x", -textSize.width / 2 - padding)
-                .attr("y", -textSize.height / 2 - padding / 2)
-                .attr("width", textSize.width + padding * 2)
-                .attr("height", textSize.height + padding)
-                .attr("fill", "white")  // Set background color
-                .attr("stroke", "black") // Optional: Add a border
-                .attr("opacity", 1);  // Ensure it's fully visible
-            tooltip.raise()
-            tooltip.style("opacity", 1);
+            svg.append("text")
+                .attr("class", "value-label")
+                .attr("x", x(config.verticalLine.position) + 5)
+                .attr("y", mouseY)
+                .text(`${percentile}% < ${verticalLinePosition.toFixed(2)}`)
+                .attr("font-size", "10px")
+                .attr("fill", "black");
         })
-        .on("mouseout", () => tooltip.style("opacity", 0));
-            
+        .on("mouseout", function() {
+            svg.selectAll(".value-label").remove();
+        });
     }
-    
-    // Add x axis
+        
+    // Simplified axes with meaningful ticks for subjectivity
     svg.append("g")
         .attr("transform", `translate(0,${config.height})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).ticks(5).tickValues([0, 0.25, 0.5, 0.75, 1]));
     
-    // Add y axis
     svg.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y).ticks(5));
     
-    // Add x axis label
+    // Simplified labels
     svg.append("text")
-        .attr("class", "axis-label")
         .attr("x", config.width / 2)
-        .attr("y", config.height + config.margin.bottom - 10)
+        .attr("y", config.height + 30)
         .style("text-anchor", "middle")
+        .style("font-size", "10px")
         .text("Subjectivity Score (0 to 1)");
     
-    // Add y axis label
     svg.append("text")
-        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("x", -config.height / 2)
-        .attr("y", -config.margin.left + 15)
+        .attr("y", -25)
         .style("text-anchor", "middle")
+        .style("font-size", "10px")
         .text("Density");
-    
-    // Add title
-    svg.append("text")
-        .attr("class", "chart-title")
-        .attr("x", config.width / 2)
-        .attr("y", -config.margin.top / 2)
-        .style("text-anchor", "middle")
-        .text("Distribution of Average Sentence Subjectivity");
 }
 
-// Kernel functions same as above...
-// Kernel Density Estimation functions
+// Kernel Density Estimation functions (unchanged)
 function kernelDensityEstimator(kernel, X) {
     return function(V) {
         return X.map(function(x) {
