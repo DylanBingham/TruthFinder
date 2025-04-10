@@ -1,17 +1,24 @@
 function createFleschReadingEaseChart(data, verticalLinePosition) {
     // Configuration
+const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");    
+    const containerWidth = container.node().getBoundingClientRect().width;
+    const containerHeight = 300;
+
+    // Clear any existing content
+    container.html("");
+    
     const config = {
-        width: 700,
-        height: 300,
-        margin: { top: 40, right: 30, bottom: 50, left: 50 },
-        numBins: 50,
-        kdePoints: 1000,
+        width: containerWidth - 40, // Account for padding
+        height: containerHeight - 40,
+        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        numBins: 30, // Reduced number of bins for smaller containers
+        kdePoints: 500,
         verticalLine: {
             position: verticalLinePosition,
             color: "#FF5733",
             strokeWidth: 2,
             strokeDasharray: "5,5",
-            hoverColor: "#FF0000"  // Brighter color on hover
+            hoverColor: "#FF0000"
         }
     };
 
@@ -19,8 +26,7 @@ function createFleschReadingEaseChart(data, verticalLinePosition) {
     const filteredData = data.map(d => +d.flesch_reading_ease).filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
     
-    // Create container div
-    const container = d3.select("#flesch-reading-ease-chart");
+
     
     // Create SVG
     const svg = container.append("svg")
@@ -28,6 +34,7 @@ function createFleschReadingEaseChart(data, verticalLinePosition) {
         .attr("height", config.height + config.margin.top + config.margin.bottom)
         .append("g")
         .attr("transform", `translate(${config.margin.left},${config.margin.top})`);
+        
     if (svg.select("defs").empty()) {
         const defs = svg.append("defs");
         
@@ -70,12 +77,12 @@ function createFleschReadingEaseChart(data, verticalLinePosition) {
     svg.selectAll("rect")
         .data(bins)
         .enter().append("rect")
-        .attr("class", "bar")
         .attr("x", d => x(d.x0) + 1)
         .attr("y", d => y(d.length / filteredData.length))
         .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-        .attr("height", d => config.height - y(d.length / filteredData.length));
-    
+        .attr("height", d => config.height - y(d.length / filteredData.length))
+        .attr("fill", "#4e79a7") // Distinct blue color
+        .attr("opacity", 0.7);
     // Create KDE line
     const kde = kernelDensityEstimator(kernelEpanechnikov(0.5), x.ticks(config.kdePoints));
     const kdeData = kde(filteredData);
@@ -86,8 +93,10 @@ function createFleschReadingEaseChart(data, verticalLinePosition) {
     
     svg.append("path")
         .datum(kdeData)
-        .attr("class", "kde-line")
-        .attr("d", line);
+        .attr("d", line)
+        .attr("fill", "none")
+        .attr("stroke", "#e15759") // Distinct red color
+        .attr("stroke-width", 2);
     
     // Add vertical line at specified position
     if (config.verticalLine.position !== null && !isNaN(config.verticalLine.position)) {

@@ -1,26 +1,26 @@
 function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
     const container = d3.select("#avg-sentence-polarity-chart .chart-svg-container");
-    const containerWidth = container.node().parentNode.getBoundingClientRect().width;
-    const containerHeight = 300; // Fixed height for chart area
+    const containerWidth = container.node().getBoundingClientRect().width;
+    const containerHeight = 300;
     
     // Clear only the chart area
     container.html("");
 
     // Config with proper dimensions accounting for margins
     const config = {
-        width: containerWidth - 40,
+        width: containerWidth - 40, // Account for padding
         height: containerHeight - 40,
-        margin: { top: 30, right: 20, bottom: 40, left: 40 },
-        numBins: 20,
-        kdePoints: 100,
+        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        numBins: 30, // Reduced number of bins for smaller containers
+        kdePoints: 500,
         verticalLine: {
             position: verticalLinePosition,
-            color: "#ff0000",
+            color: "#FF5733",
             strokeWidth: 2,
-            strokeDasharray: "5,5"
+            strokeDasharray: "5,5",
+            hoverColor: "#FF0000"
         }
     };
-
     const filteredData = data.map(d => +d.avg_sentence_polarity).filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
 
