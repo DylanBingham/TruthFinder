@@ -88,7 +88,8 @@
 
     <script>
         // Load data and create all charts
-        d3.csv("final_dataset_with_pca_d3.csv").then(data => {
+        d3.csv("static/final_dataset_with_pca_d3.csv").then(data => {
+            console.log("Data successfully loaded:", data);
             createFleschReadingEaseChart(data,-10);
             createWordCountChart(data,400);
             createOverallPolarityChart(data,0);

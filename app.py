@@ -6,6 +6,10 @@ import pickle
 from utils import extract_features_from_article
 import datetime
 from datetime import datetime
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = Flask(__name__)
 CORS(app)
@@ -29,23 +33,27 @@ articles = {
 }
 
 # Define a route to extract features for an article specified by title or URL
-@app.route('/extract_features', methods=['POST'])
-def extract_features_route():
-    data = request.get_json()
-    article_title = data.get("article_title")
-    url = data.get("url")
+# @app.route('/extract_features', methods=['POST'])
+# def extract_features_route():
+#     logging.debug("Received request to extract features.")
+#     data = request.get_json()
+#     logging.debug(f"Request data: {data}")
+#     article_title = data.get("article_title")
+#     url = data.get("url")
     
-    # Lookup the article text using the provided article_title or url
-    if article_title and article_title in articles:
-        article_text = articles[article_title]
-    elif url and url in articles:
-        article_text = articles[url]
-    else:
-        return jsonify({"error": "Article not found."}), 404
+#     # Lookup the article text using the provided article_title or url
+#     if article_title and article_title in articles:
+#         article_text = articles[article_title]
+#     elif url and url in articles:
+#         article_text = articles[url]
+#     else:
+#         logging.warning("Article not found.")
+#         return jsonify({"error": "Article not found."}), 404
 
-    # Extract features from the article text
-    features = extract_features_from_article(article_text)
-    return jsonify(features)
+#     # Extract features from the article text
+#     features = extract_features_from_article(article_text)
+#     logging.debug(f"Extracted features: {features}")
+#     return jsonify(features)
 
 
 # Serve index.html at the root URL
@@ -64,19 +72,22 @@ global_resp_data = {}
 # Your existing API routes
 @app.route('/save_url', methods=['POST'])
 def save_url():
+    logging.debug("Received request to save URL.")
     try:
         data = request.get_json()
+        logging.debug(f"Request data: {data}")
     except Exception as e:
-        print("Error parsing JSON:", e)
+        logging.error(f"Error parsing JSON: {e}")
         return jsonify({"error": "Invalid JSON"}), 400
 
     url = data.get("url") if data else None
 
   
     if not url:
+        logging.warning("No URL provided in request.")
         return jsonify({"error": "No URL provided"}), 400
 
-    print(f"THE URL IS {url}")
+    logging.info(f"Processing URL: {url}")
     def extract_text(url):
         with open("article_text.pkl", "rb") as file:
             d = pickle.load(file)
@@ -84,10 +95,10 @@ def save_url():
     input_text = extract_text(url)
     # print(f'Input text (first 30 characters) is {input_text[0:30]}')
     f,pred = extract_features_from_article(input_text)
-    print("----------------------------------------------------------------------------------------")
-    print(f)
-    print(pred)
-    print("EXTRACTED FEATURES:----------------------------------------------------------------------------------------")
+    logging.debug("----------------------------------------------------------------------------------------")
+    logging.debug(f"Extracted features: {f}")
+    logging.debug(f"Prediction: {pred}")
+    logging.info("EXTRACTED FEATURES:----------------------------------------------------------------------------------------")
     
     
     # print(f'Model Result: {pred}')
@@ -152,8 +163,8 @@ def save_url():
 
     confidence_score, confidence_string = calculate_confidence( round(f['overall_polarity'], 2), round(f['overall_subjectivity'], 2), round(f['word_count'], 0), round(f['num_speech_attributes'], 0), round(f['flesch_reading_ease'], 0))
 
-    print(f"Confidence Score: {confidence_score}")
-    print(f"Confidence String: {confidence_string}")
+    logging.info(f"Confidence Score: {confidence_score}")
+    logging.info(f"Confidence String: {confidence_string}")
 
     global_resp_data = [
         {
@@ -174,11 +185,11 @@ def save_url():
     try:
         with open("output_data.json", 'w') as file:
             json.dump(global_resp_data, file, indent=4)
-            print(f"Data successfully written to output_data.json.")
+            logging.info("Data successfully written to output_data.json.")
     except Exception as e:
-        print(f"An error occurred while writing to output_data.json: {e}")
+        logging.error(f"An error occurred while writing to output_data.json: {e}")
     
-    print("----------------------------------------------------------------------------------------")
+    logging.debug("----------------------------------------------------------------------------------------")
 
 
     if not url:
@@ -193,17 +204,19 @@ def save_url():
 @app.route('/get_output', methods=['GET'])
 
 def get_output():
+    logging.debug("Received request to get output data.")
     try:
         filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output_data.json')
+        logging.debug(f"Looking for file at: {filepath}")
         
         # Check if file exists
         if not os.path.exists(filepath):
-            print(f"{datetime.now()} - output_data.json not found at {filepath}")
+            logging.warning(f"{datetime.now()} - output_data.json not found at {filepath}")
             return jsonify({"error": "Data file not found"}), 404
         
         # Check file permissions
         if not os.access(filepath, os.R_OK):
-            print(f"{datetime.now()} - Permission denied for {filepath}")
+            logging.warning(f"{datetime.now()} - Permission denied for {filepath}")
             return jsonify({"error": "Cannot read data file"}), 403
         
         # Read and validate file
@@ -212,20 +225,21 @@ def get_output():
             
             # Validate data structure
             if not isinstance(data, list) or len(data) == 0:
-                print(f"{datetime.now()} - Invalid data format in file")
+                logging.error(f"{datetime.now()} - Invalid data format in file")
                 return jsonify({"error": "Invalid data format"}), 500
                 
             if 'fake_percent' not in data[0]:
-                print(f"{datetime.now()} - Missing required fields")
+                logging.error(f"{datetime.now()} - Missing required fields")
                 return jsonify({"error": "Missing data fields"}), 500
                 
+        logging.info("Successfully retrieved output data.")
         return jsonify(data)
         
     except json.JSONDecodeError:
-        print(f"{datetime.now()} - Invalid JSON in file")
+        logging.error(f"{datetime.now()} - Invalid JSON in file")
         return jsonify({"error": "Corrupted data file"}), 500
     except Exception as e:
-        print(f"{datetime.now()} - Unexpected error: {str(e)}")
+        logging.error(f"{datetime.now()} - Unexpected error: {str(e)}")
         return jsonify({"error": "Server error"}), 500
     
 if __name__ == '__main__':
