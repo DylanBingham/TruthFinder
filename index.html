@@ -37,14 +37,6 @@
       line-height: 1.6;
       font-family: sans-serif;
     }
-
-    #outputSection {
-      max-width: 100%;
-      overflow-x: hidden;
-      box-sizing: border-box;
-      padding: 0 15px;
-    }
-
     .container {
       width: 75%;
       margin: 40px auto;
@@ -147,21 +139,18 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr); /* 2 columns */
       gap: 20px;
-      width: 100%;
-      box-sizing: border-box;
+      margin: 20px 0;
     }
     /* Modern Metric Card styling */
     .metric-card {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
       background-color: var(--card-bg);
       padding: 20px;
+      overflow: visible !important; /* This is crucial */
       border-radius: 12px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
-      overflow: hidden
+      z-index: 1;
     }
     .metric-card:hover {
       transform: translateY(-5px);
@@ -180,26 +169,28 @@
     /* Tooltip Styling */
     .tooltip {
       visibility: hidden;
-      width: 220px;
+      width: 500px;
       background-color: #333;
       color: #fff;
       text-align: center;
       border-radius: 6px;
       padding: 8px;
-      position: absolute;
-      z-index: 1;
-      bottom: 120%;
+      position: absolute; /* Changed from fixed to absolute */
+      bottom: calc(100% + 10px); /* Position above the card */
       left: 50%;
       transform: translateX(-50%);
       opacity: 0;
       transition: opacity 0.3s;
-      font-size: 14px;
+      font-size: 20px;
+      z-index: 1000; /* Can be lower now */
+      pointer-events: none; /* Prevents tooltip from blocking interactions */
     }
+    
     .metric-card:hover .tooltip {
       visibility: visible;
-      opacity: 1;
-      order:10000;
+      opacity: 1; /* ensure fully visible */
     }
+    
     .tooltip::after {
       content: "";
       position: absolute;
@@ -208,7 +199,7 @@
       margin-left: -5px;
       border-width: 5px;
       border-style: solid;
-      border-color: #333 transparent transparent transparent;
+      border-color: #333 transparent transparent transparent; /* solid arrow */
     }
     /* Verdict Badge */
     .verdict-badge {
@@ -223,14 +214,15 @@
     .chart-container {
       width: 100%; /* Full width of the grid cell */
       height: 500px; /* Keep height as before */
-      margin: 10px -10px;
+      margin: 10px 0;
       border: 1px solid #ddd;
       border-radius: 12px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       padding: 10px;
       background-color: var(--card-bg);
       position: relative;
-      overflow: hidden;
+      overflow: visible !important;
+      
       display: flex;
       flex-direction: column;
     }
@@ -245,9 +237,13 @@
     /* Additional Hover Effects for Scale Labels */
     .scale-label {
       transition: transform 0.2s;
+      z-index:10000;
+      overflow: visible !important;
+      white-space: nowrap; /* Prevent text wrapping */
     }
     .scale-label:hover {
       transform: scale(1.1);
+      z-index:10000;
     }
 
     /* ---------------- Modal Styles ---------------- */
@@ -388,8 +384,12 @@
     .scale-label-neg { left: 0; }
     .scale-label-pos { right: 0; }
     .scale-label-neutral { left: 50%; transform: translateX(-50%); }
-    .scale-label-min { left: 0; }
-    .scale-label-max { right: 0; }
+    .scale-label-min { left: 0; 
+      z-index: 99999;    
+    }
+    .scale-label-max { right: 0; 
+      z-index: 99999;
+    }
     .scale-label-mid { left: 50%; transform: translateX(-50%); }
     
     .scale-instruction {
@@ -400,11 +400,18 @@
     }
     .chart-svg-container {
       order: 2;
-      z-index: 1;
+      z-index: 0;
       height: 300px;
+      width: 860px;
+      margin-top: 30px;
+
+      position: relative;
     }
     .scale-indicator {
       z-index: 3;
+    }
+    .container, .scale-label, body {
+      overflow: visible !important;
     }
   </style>
 </head>
@@ -511,7 +518,7 @@
           </div>
         `;
         setTickPosition(result.fake_percent);
-        d3.csv("static/final_dataset_with_pca_d3.csv")
+        d3.csv("/static/final_dataset_with_pca_d3.csv")
           .then((data) => {
             createFleschReadingEaseChart(data, result.flesch_reading_ease);
             createWordCountChart(data, result.word_count);
@@ -538,6 +545,12 @@
                             </div>
                             <div class="scale-label scale-label-0">-1</div>
                             <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-label scale-label-min"  data-tooltip="Place Holder">
+                                0
+                            </div>
+                            <div class="scale-label scale-label-max"  data-tooltip="Place Holder">
+                                1
+                            </div>
                             <div class="scale-instruction">Hover over ends of scale</div>
                           </div>
                           <!-- Chart will be inserted here -->
@@ -562,6 +575,12 @@
                             </div>
                             <div class="scale-label scale-label-0">0</div>
                             <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-label scale-label-min"  data-tooltip="Place Holder">
+                                0
+                            </div>
+                            <div class="scale-label scale-label-max"  data-tooltip="Place Holder">
+                                1
+                            </div>
                             <div class="scale-instruction">Hover over ends of scale</div>
                           </div>
                           <!-- Chart will be inserted here -->
@@ -580,12 +599,18 @@
                             <div class="scale-track"></div>
                             
                             <!-- The indicator -->
-                            <div class="scale-indicator" style="left: ${(result.polarity_score + 1) * 50}%;">
+                            <div class="scale-indicator" style="left: ${(result.polarity_score *100)}%;">
                               <div class="indicator-line"></div>
                               <div class="indicator-dot"></div>
                             </div>
                             <div class="scale-label scale-label-0">0</div>
                             <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-label scale-label-min"  data-tooltip="Place Holder">
+                                0
+                            </div>
+                            <div class="scale-label scale-label-max"  data-tooltip="Place Holder">
+                                1
+                            </div>
                             <div class="scale-instruction">Hover over ends of scale</div>
                           </div>
                           <!-- Chart will be inserted here -->
@@ -610,11 +635,11 @@
                             </div>
                             <div class="scale-label scale-label-0">0</div>
                             <div class="scale-label scale-label-1">1</div>
-                            <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                            <div class="scale-label scale-label-min"  data-tooltip="Place Holder">
                                 0
                             </div>
-                            <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
-                                100
+                            <div class="scale-label scale-label-max"  data-tooltip="Place Holder">
+                                1
                             </div>
                             <div class="scale-instruction">Hover over ends of scale</div>
                           </div>

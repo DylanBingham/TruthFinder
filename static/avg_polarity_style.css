@@ -47,20 +47,23 @@
     cursor: pointer;
     padding: 2px 5px;
     border-radius: 3px;
-    z-index:1000;
+    z-index:10000;
     transition: background 0.2s;
 }
 
 .scale-label:hover {
     background: #f0f0f0;
+    z-index: 10000;
 }
 
 .scale-label-0 {
     left: 0;
+    z-index: 10000;
 }
 
 .scale-label-1 {
     right: 0;
+    z-index: 10000;
 }
 
 /* Tooltip styling */
@@ -86,6 +89,7 @@
 .scale-label:hover::after {
     opacity: 1;
     visibility: visible;
+    z-index: 10000;
 }
 
 
@@ -131,6 +135,7 @@
 .subjectivity-scale .scale-label {
     position: absolute;
     top: 30px;
+    z-index: 10000;
     font-size: 12px;
     font-weight: bold;
     cursor: pointer;
@@ -141,6 +146,8 @@
 
 .subjectivity-scale .scale-label:hover {
     background: #f0f0f0;
+    z-index: 10000;
+
 }
 
 .subjectivity-scale .scale-label-0 {
@@ -174,6 +181,7 @@
 .subjectivity-scale .scale-label:hover::after {
     opacity: 1;
     visibility: visible;
+    z-index: 10000;
 }
 
 /* polarity-score-scale.css */
@@ -224,6 +232,7 @@
     top: 30px;
     font-size: 12px;
     font-weight: bold;
+    z-index: 10000;
     cursor: pointer;
     padding: 2px 5px;
     border-radius: 3px;
@@ -260,16 +269,18 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s;
-    z-index: 9999;
+    z-index: 10000;
 }
 
 .polarity-score-scale .scale-label:hover {
     background: #f0f0f0;
+    z-index: 10000;
 }
 
 .polarity-score-scale .scale-label:hover::after {
     opacity: 1;
     visibility: visible;
+    z-index: 10000;
 }
 
 /* subjectivity-score-scale.css */
@@ -321,6 +332,7 @@
     padding: 2px 5px;
     border-radius: 3px;
     transition: background 0.2s;
+    z-index: 10000;
 }
 
 .subjectivity-score-scale .scale-label-min {
@@ -360,11 +372,13 @@
 
 .subjectivity-score-scale .scale-label:hover {
     background: #f0f0f0;
+    z-index: 100000;
 }
 
 .subjectivity-score-scale .scale-label:hover::after {
     opacity: 1;
     visibility: visible;
+    z-index: 10000;
 }
 
 /* readability-scale.css */
@@ -470,11 +484,13 @@
 .readability-scale .scale-label:hover::after,
 .readability-scale .zone-marker:hover::after {
     opacity: 1;
+    z-index: 10000;
     visibility: visible;
 }
 
 .readability-scale .scale-label:hover {
     background: #f0f0f0;
+    z-index: 10000;
 }
 
 .scale-instruction {
