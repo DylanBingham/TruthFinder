@@ -1,335 +1,717 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Save URL Input</title>
-    <style>
-        /* Styling for the gradient line */
-        .gradient-line {
-            width: 100%;
-            height: 20px;
-            background: linear-gradient(to right, lightgreen, darkred); /* Green to red gradient */
-            position: relative;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Save URL Input</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="/static/flesch_reading_ease_chart.js"></script>
+  <script src="/static/word_count_chart.js"></script>
+  <script src="/static/overall_polarity_chart.js"></script>
+  <script src="/static/overall_subjectivity_chart.js"></script>
+  <script src="/static/avg_sentence_polarity_chart.js"></script>
+  <script src="/static/avg_sentence_subjectivity_chart.js"></script>
+  <script src="/static/num_speech_attributes_chart.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="/static/avg_polarity_style.css" />
 
-        /* Styling for the tick (indicator) */
-        .tick {
-            position: absolute;
-            top: -10px;
-            width: 2px;
-            height: 30px;
-            background-color: black; /* Tick color */
-        }
+  <style>
+    /* CSS Variables for consistent styling */
+    :root {
+      --primary-color: #4caf50;
+      --secondary-color: #2e7d32;
+      --background-color: #f5f5f5;
+      --card-bg: #ffffff;
+      --font-color: #333;
+      --accent-color: #ffeb3b;
+      --error-color: #f44336;
+    }
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Open Sans", sans-serif;
+      background: url('static/background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--font-color);
+      line-height: 1.6;
+      font-family: sans-serif;
+    }
 
-        /* Styling for the overall container */
-        .container {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-        }
+    #outputSection {
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+      padding: 0 15px;
+    }
 
-        #outputData {
-            margin-top: 20px;
-        }
+    .container {
+      width: 75%;
+      margin: 40px auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--secondary-color);
+    }
+    select,
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    select:focus,
+    button:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+    button {
+      background-color: var(--primary-color);
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: var(--secondary-color);
+    }
+    #responseMessage {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: 600;
+    }
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Cards for Results & Errors */
+    .result-card,
+    .error-card,
+    .result-summary {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .result-card {
+      border-top: 4px solid var(--primary-color);
+    }
+    .error-card {
+      border-top: 4px solid var(--error-color);
+      color: var(--error-color);
+    }
+    .error-card button {
+      background-color: var(--error-color);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    /* Gradient Line Styling */
+    .gradient-line {
+      width: 100%;
+      height: 20px;
+      background: linear-gradient(to right, lightgreen, darkred);
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .tick {
+      position: absolute;
+      top: -6px;
+      width: 4px;
+      height: 32px;
+      background-color: #000;
+    }
+    /* Metrics Grid Layout */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 columns */
+      gap: 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    /* Modern Metric Card styling */
+    .metric-card {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden
+    }
+    .metric-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+    .metric-card h4 {
+      margin: 0 0 10px;
+      color: var(--secondary-color);
+      font-size: 16px;
+    }
+    .metric-value {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--font-color);
+    }
+    /* Tooltip Styling */
+    .tooltip {
+      visibility: hidden;
+      width: 220px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+    }
+    .metric-card:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+      order:10000;
+    }
+    .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+    /* Verdict Badge */
+    .verdict-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: var(--accent-color);
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    /* Chart Container Styling */
+    .chart-container {
+      width: 100%; /* Full width of the grid cell */
+      height: 500px; /* Keep height as before */
+      margin: 10px -10px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      background-color: var(--card-bg);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .axis-label,
+    .chart-title {
+      font-size: 14px;
+      font-family: "Open Sans", sans-serif;
+    }
+    svg {
+      overflow: visible;
+    }
+    /* Additional Hover Effects for Scale Labels */
+    .scale-label {
+      transition: transform 0.2s;
+    }
+    .scale-label:hover {
+      transform: scale(1.1);
+    }
+
+    /* ---------------- Modal Styles ---------------- */
+    /* Reduced-size fixed button in the top left corner */
+    #infoButton {
+      width: 150px;    /* sets the width of the button */
+      height: 80px;
+      position: fixed;
+      top: 5px;
+      left: 5px;
+      z-index: 1100;
+      background-color: var(--primary-color);
+      border: none;
+      color: #fff;
+      padding: 5px 10px;    /* Reduced padding for smaller button */
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 20px;      /* Reduced font-size */
+    }
+    /* The Modal (background) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1050;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    /* Modal Content Box */
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 8px;
+      position: relative;
+    }
+    /* Close Button */
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+    }
+    
+    .chart-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: auto; /* Let content determine height */
+    }
+    
+    /* Scale container styling */
+    .polarity-scale,
+    .subjectivity-scale,
+    .polarity-score-scale,
+    .subjectivity-score-scale,
+    .readability-scale {
+      order: 1; /* Makes scale appear above chart */
+      position: relative;
+      z-index: 2; /* Higher than the chart */
+      background: rgba(255,255,255,0.95);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: -10px; /* Overlap slightly with chart */
+    }
+    
+    
+    /* Chart SVG container */
+    .chart-container svg {
+      position: relative;
+      z-index: 1; /* Below the scale */
+      margin-top: -10px; /* Pull up slightly */
+    }
+    
+    /* Scale track styling */
+    .scale-track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 10px;
+      border-radius: 5px;
+      background-color: #ccc; /* or your desired color */
+      transform: translateY(-50%);
+      z-index: 1;
+    }
         
-        /* Loading Spinner */
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(0,0,0,0.1);
-            border-radius: 50%;
-            border-top-color: #000;
-            animation: spin 1s linear infinite;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-        
-        /* Output Cards */
-        .result-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 4px solid #4CAF50;
-        }
-        
-        .error-card {
-            background: #ffebee;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 4px solid #f44336;
-            color: #d32f2f;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
-        
-        .metric-card {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 3px solid #4CAF50;
-            position: relative;
-        }
-        
-        .metric-card h4 {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .metric-card .tooltip {
-            visibility: hidden;
-            width: 200px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%; /* Position above the element */
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }     
-        .metric-card:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }   
-        
-        .metric-card .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent transparent;
-        }
-        .metric-value {
-            font-weight: bold;
-            font-size: 18px;
-            color: #222;
-        }
-        
-        .verdict-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #ffeb3b;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-        
-        .result-summary {
-            background: #e8f5e9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .result-summary h3 {
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-        }
-        
-        .score {
-            color: #2e7d32;
-            font-size: 24px;
-        }
-        
-        .error-card button {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-    </style>
+    /* Indicator styling */
+    .scale-indicator {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%); /* horizontally and vertically center */
+      z-index: 7; /* make sure it sits above the scale */
+    }
+    
+    .indicator-line {
+      height: 30px;
+      width: 2px;
+      background: #333;
+      margin: 0 auto;
+    }
+    
+    .indicator-dot {
+      width: 14px;
+      height: 14px;
+      background: #333;
+      border-radius: 50%;
+      margin: -6px auto 0;
+    }
+    
+    /* Scale label styling */
+    .scale-label {
+      position: absolute;
+      top: 25px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .scale-label-0 { left: 0; }
+    .scale-label-1 { right: 0; }
+    .scale-label-neg { left: 0; }
+    .scale-label-pos { right: 0; }
+    .scale-label-neutral { left: 50%; transform: translateX(-50%); }
+    .scale-label-min { left: 0; }
+    .scale-label-max { right: 0; }
+    .scale-label-mid { left: 50%; transform: translateX(-50%); }
+    
+    .scale-instruction {
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .chart-svg-container {
+      order: 2;
+      z-index: 1;
+      height: 300px;
+    }
+    .scale-indicator {
+      z-index: 3;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Enter a URL</h2>
-        <input type="text" id="urlInput" placeholder="Enter URL here">
-        <button onclick="saveToServer()">Save</button>
-        <p id="responseMessage"></p>
-    
-        <!-- Output Section (initially hidden) -->
-        <div id="outputSection" style="display: none;">
-            <h3>Analysis Results</h3>
-            <div id="outputData"></div>
-            
-            <!-- Metrics Grid -->
-            <div class="metrics-grid" id="metricsDisplay"></div>
-            
-            <!-- Gradient Line -->
-            <div class="gradient-line" id="gradientLine">
-                <div class="tick" id="tick"></div>
-            </div>
-        </div>
+  <!-- Fixed Information Button -->
+  <button id="infoButton">Info</button>
+
+  <!-- Modal Structure -->
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3>Information</h3>
+      <p>
+        <strong>Polarity:</strong> the overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.
+      </p>
+      <p>
+        <strong>Subjectivity:</strong> the overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.
+      </p>
+      <p>
+        <strong>Avg Polarity:</strong> the average polarity of the article's sentences. A more fine-grained measure of polarity.
+      </p>
+      <p>
+        <strong>Avg Subjectivity:</strong> the average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.
+      </p>
+      <p>
+        <strong>Word Count:</strong> the length of an article.
+      </p>
+      <p>
+        <strong>Quotes:</strong> an approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.
+      </p>
+      <p>
+        <strong>Flesch Reading Ease:</strong> a measure of text readability based on text length and syllabic content. Difficult to Read = 1, Easy to Read = 100.
+      </p>
     </div>
+  </div>
 
-    <script>
-        async function saveToServer() {
-            const url = document.getElementById("urlInput").value;
-            if (url.trim() === "") {
-                alert("Please enter a valid URL");
-                return;
-            }
-        
-            // Show loading state
-            document.getElementById("responseMessage").innerText = `Analyzing: ${url}`;
-            document.getElementById("outputSection").style.display = "none"; // Hide output
-            
-            // Show loading spinner (add this element if you don't have it)
-            const spinner = document.createElement('div');
-            spinner.className = 'loading-spinner';
-            document.getElementById("responseMessage").appendChild(spinner);
-        
-            try {
-                // Start both the API call and 5-second timer simultaneously
-                const [response] = await Promise.all([
-                    fetch("http://127.0.0.1:5000/save_url", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ url: url })
-                    }),
-                    new Promise(resolve => setTimeout(resolve, 5000))
-                ]);
-        
-                const result = await response.json();
-                document.getElementById("responseMessage").innerText = `Analysis complete for: ${url}`;
+  <div class="container">
+    <h2 style="font-size: 2em;">Select an Article to be Analyzed</h2>
+    <select id="urlInput">
+      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
+      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
+      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
+      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
+    </select>
+    <button onclick="saveToServer()">Save</button>
+    <p id="responseMessage"></p>
+    <!-- Output Section (initially hidden) -->
+    <div id="outputSection" style="display: none; padding: 5px; font-size: 1.8em;">
+      <h3>Analysis Results</h3>
+      <div id="outputData"></div>
+      <div class="metrics-grid" id="metricsDisplay"></div>
+    </div>
+  </div>
+
+  <script>
+    async function saveToServer() {
+      const url = document.getElementById("urlInput").value;
+      if (url.trim() === "") {
+        alert("Please enter a valid URL");
+        return;
+      }
+      document.getElementById("responseMessage").innerText = `Analyzing: ${url}`;
+      document.getElementById("outputSection").style.display = "none";
+      const spinner = document.createElement("div");
+      spinner.className = "loading-spinner";
+      document.getElementById("responseMessage").appendChild(spinner);
+      try {
+        const [response] = await Promise.all([
+          fetch("http://127.0.0.1:5000/save_url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: url })
+          }),
+          new Promise((resolve) => setTimeout(resolve, 5000)),
+        ]);
+        const result = await response.json();
+        document.getElementById("responseMessage").innerText = `Analysis complete for: ${url}`;
+        document.getElementById("outputSection").style.display = "block";
+        fetchOutputData();
+      } catch (error) {
+        document.getElementById("responseMessage").innerText = `Error analyzing URL: ${error.message}`;
+      } finally {
+        const spinner = document.querySelector(".loading-spinner");
+        if (spinner) spinner.remove();
+      }
+    }
+
+    async function fetchOutputData() {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/get_output");
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Server error");
+        if (!data || !data.length) throw new Error("No data available");
+        const result = data[0];
+        document.getElementById("outputData").innerHTML = `
+          <div class="result-summary">
+            <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
+            <span class="verdict-badge">${result.fake_percent_display}</span>
+            </h3>
+            <p>Confidence: ${(result.confidence)}</p>
+            <div class="gradient-line" id="gradientLine">
+              <div class="tick" id="tick"></div>
+            </div>
+          </div>
+        `;
+        setTickPosition(result.fake_percent);
+        d3.csv("static/final_dataset_with_pca_d3.csv")
+          .then((data) => {
+            createFleschReadingEaseChart(data, result.flesch_reading_ease);
+            createWordCountChart(data, result.word_count);
+            createOverallPolarityChart(data, result.polarity_score);
+            createOverallSubjectivityChart(data, result.subjectivity_score);
+            createAvgSentencePolarityChart(data, result.avg_polarity);
+            createAvgSentenceSubjectivityChart(data, result.avg_subjectivity);
+            createNumSpeechAttributesChart(data, result.num_quotes);
+          })
+          .catch((error) => {
+            console.error("Error loading the data:", error);
+          });
+          document.getElementById("metricsDisplay").innerHTML = `
+                <div class="metric-card">
+                    <h4>Avg. Polarity</h4>
+                    <div class="metric-value">${result.avg_polarity}</div>
+                        <div id="avg-sentence-polarity-chart" class="chart-container">
+                          <!-- Scale container (won't be cleared by D3) -->
+                          <div class="subjectivity-scale">
+                            <div class="scale-track"></div>
+                            <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
+                              <div class="indicator-line"></div>
+                              <div class="indicator-dot"></div>
+                            </div>
+                            <div class="scale-label scale-label-0">-1</div>
+                            <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-instruction">Hover over ends of scale</div>
+                          </div>
+                          <!-- Chart will be inserted here -->
+                          <div class="chart-svg-container"></div>
+                        </div>
+                    <span class="tooltip">The overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.</span>
+                </div>
+                                    
+                <div class="metric-card">
+                    <h4>Avg. Subjectivity</h4>
+                    <div class="metric-value">${result.avg_subjectivity}</div>
+                    <div id="avg-sentence-subjectivity-chart" class="chart-container">
+                        <!-- Scale container -->
+                        <div class="subjectivity-scale">
+                            <!-- The scale track - blue gradient for objectivity/subjectivity -->
+                            <div class="scale-track"></div>
+                            
+                            <!-- The indicator for the current value -->
+                            <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
+                              <div class="indicator-line"></div>
+                              <div class="indicator-dot"></div>
+                            </div>
+                            <div class="scale-label scale-label-0">0</div>
+                            <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-instruction">Hover over ends of scale</div>
+                          </div>
+                          <!-- Chart will be inserted here -->
+                          <div class="chart-svg-container"></div>
+                    </div>
+                    <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
+                </div>
                 
-                // Show output section
-                document.getElementById("outputSection").style.display = "block";
-                fetchOutputData();
-        
-            } catch (error) {
-                document.getElementById("responseMessage").innerText = `Error analyzing URL: ${error.message}`;
-            } finally {
-                // Remove spinner
-                const spinner = document.querySelector('.loading-spinner');
-                if (spinner) spinner.remove();
-            }
-        }
-        
-        async function fetchOutputData() {
-            try {
-                const response = await fetch("http://127.0.0.1:5000/get_output");
-                const data = await response.json();
+                <div class="metric-card">
+                    <h4>Polarity Score</h4>
+                    <div class="metric-value">${result.polarity_score}</div>
+                    <div id="overall-polarity-chart" class="chart-container">
+                        <!-- Scale container -->
+                        <div class="polarity-score-scale">
+                            <!-- The scale track - bidirectional gradient -->
+                            <div class="scale-track"></div>
+                            
+                            <!-- The indicator -->
+                            <div class="scale-indicator" style="left: ${(result.polarity_score + 1) * 50}%;">
+                              <div class="indicator-line"></div>
+                              <div class="indicator-dot"></div>
+                            </div>
+                            <div class="scale-label scale-label-0">0</div>
+                            <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-instruction">Hover over ends of scale</div>
+                          </div>
+                          <!-- Chart will be inserted here -->
+                          <div class="chart-svg-container"></div>
+                    </div>
+                    <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
+                </div>
                 
-                if (!response.ok) throw new Error(data.error || "Server error");
-                if (!data || !data.length) throw new Error("No data available");
-        
-                const result = data[0];
-                const tooltips = {
-                    "Avg. Polarity": "Measures overall positive/negative sentiment (-1 = negative, 1 = positive)",
-                    "Avg. Subjectivity": "0 = factual, 1 = opinionated",
-                    "Polarity Score": "Strength of sentiment (higher = more intense)",
-                    "Subjectivity Score": "How opinionated the content is",
-                    "Quotes Count": "Number of cited sources or quotes",
-                    "Word Count": "Total length of the content",
-                    "Readability Score": "0-100 (higher = easier to read)",
-                    "Last Analyzed": "When this analysis was performed"
-                };                
-                // 1. Set the tick position first
-                setTickPosition(result.fake_percent);
+                <div class="metric-card">
+                    <h4>Subjectivity Score</h4>
+                    <div class="metric-value">${result.subjectivity_score}</div>
+                    <div id="overall-subjectivity-chart" class="chart-container">
+                        <!-- Scale container -->
+                        <div class="subjectivity-score-scale">
+                            <!-- The scale track - blue gradient -->
+                            <div class="scale-track"></div>
+                            
+                            <!-- The indicator -->
+                            <div class="scale-indicator" style="left: ${result.subjectivity_score * 100}%;">
+                              <div class="indicator-line"></div>
+                              <div class="indicator-dot"></div>
+                            </div>
+                            <div class="scale-label scale-label-0">0</div>
+                            <div class="scale-label scale-label-1">1</div>
+                            <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                                0
+                            </div>
+                            <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
+                                100
+                            </div>
+                            <div class="scale-instruction">Hover over ends of scale</div>
+                          </div>
+                          <!-- Chart will be inserted here -->
+                          <div class="chart-svg-container"></div>
+                    </div>
+                    <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.</span>
+                </div>
                 
-                // 2. Create main output display
-                document.getElementById("outputData").innerHTML = `
-                    <div class="result-summary">
-                        <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
-                            <span class="verdict-badge">${result.fake_percent_display}</span>
-                        </h3>
-                        <p>Confidence: ${(result.confidence * 100).toFixed(0)}%</p>
+                <div class="metric-card">
+                    <h4>Quotes Count</h4>
+                    <div class="metric-value">${result.num_quotes}</div>
+                    <div id="num-speech-attributes-chart" class="chart-container">
+                        <div class="chart-svg-container"></div>
                     </div>
-                `;
-                
-                // 3. Create metrics grid
-                document.getElementById("metricsDisplay").innerHTML = `
-                    <div class="metric-card">
-                        <h4>Avg. Polarity</h4>
-                        <div class="metric-value">${result.avg_polarity}</div>
-                        <span class="tooltip">Measures overall sentiment (-1 to 1 where 0 is neutral)</span>
+                    <span class="tooltip">An approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.</span>
+                </div>
+                <div class="metric-card">
+                    <h4>Word Count</h4>
+                    <div class="metric-value">${result.word_count}</div>
+                    <div id="word-count-chart" class="chart-container">
+                    
+                        <div class="chart-svg-container"></div>
                     </div>
-                    <div class="metric-card">
-                        <h4>Avg. Subjectivity</h4>
-                        <div class="metric-value">${result.avg_subjectivity}</div>
-                        <span class="tooltip">0 = factual, 1 = opinionated</span>
+                    <span class="tooltip">The length of an article.</span>
+                </div>
+                <div class="metric-card">
+                    <h4>Readability</h4>
+                    <div class="metric-value">${result.flesch_reading_ease}</div>
+                    <div id="flesch-reading-ease-chart" class="chart-container">
+                        <!-- Readability scale with difficulty zones -->
+                        <div class="readability-scale">
+                            <!-- Multi-color gradient for difficulty levels -->
+                            <div class="scale-track"></div>
+                            
+                            <!-- Indicator -->
+                            <div class="scale-indicator" style="left: ${result.flesch_reading_ease}%;">
+                                <div class="indicator-line"></div>
+                                <div class="indicator-dot"></div>
+                            </div>
+                            
+                            <!-- Zone markers -->
+                            <div class="zone-marker" style="left: 30%;" data-tooltip="College level"></div>
+                            <div class="zone-marker" style="left: 50%;" data-tooltip="High school"></div>
+                            <div class="zone-marker" style="left: 70%;" data-tooltip="8th grade"></div>
+                            <div class="zone-marker" style="left: 90%;" data-tooltip="5th grade"></div>
+                            
+                            <!-- Scale labels -->
+                            <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                                0
+                            </div>
+                            <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
+                                100
+                            </div>
+                            <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                        </div>
+                        <div class="chart-svg-container"></div>
                     </div>
-                    <div class="metric-card">
-                        <h4>Polarity Score</h4>
-                        <div class="metric-value">${result.polarity_score}</div>
-                        <span class="tooltip">Strength of emotional tone</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Subjectivity Score</h4>
-                        <div class="metric-value">${result.subjectivity_score}</div>
-                        <span class="tooltip">How opinionated vs factual the content is</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Quotes Count</h4>
-                        <div class="metric-value">${result.num_quotes}</div>
-                        <span class="tooltip">Number of external sources cited</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Word Count</h4>
-                        <div class="metric-value">${result.word_count}</div>
-                        <span class="tooltip">Total length of the analyzed content</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Readability</h4>
-                        <div class="metric-value">${result.flesch_reading_ease}</div>
-                        <span class="tooltip">0-100 scale (higher = easier to read)</span>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Last Analyzed</h4>
-                        <div class="metric-value">${new Date(result.last_updated).toLocaleString()}</div>
-                        <span class="tooltip">When this analysis was performed</span>
-                    </div>
-                `;
-                
-            } catch (error) {
-                document.getElementById("outputData").innerHTML = `
-                    <div class="error-card">
-                        <h3>Error Loading Results</h3>
-                        <p>${error.message}</p>
-                        <button onclick="fetchOutputData()">Retry</button>
-                    </div>
-                `;
-            }
-        }
+                    <span class="tooltip">A measure of text readability based on text length and syllabic content. Difficult to Read = 1, Easy to Read = 100.</span>
+                </div>
+            `;
+      } catch (error) {
+        document.getElementById("outputData").innerHTML = `
+          <div class="error-card">
+            <h3>Error Loading Results</h3>
+            <p>${error.message}</p>
+            <button onclick="fetchOutputData()">Retry</button>
+          </div>
+        `;
+      }
+    }
 
+    function setTickPosition(fakePercent) {
+      const gradientLine = document.getElementById("gradientLine");
+      const tick = document.getElementById("tick");
+      const position = (fakePercent / 100) * gradientLine.offsetWidth;
+      tick.style.left = `${position}px`;
+    }
 
+    // ---------------- Modal (Information Popup) Script ---------------- //
+    var infoButton = document.getElementById("infoButton");
+    var infoModal = document.getElementById("infoModal");
+    var closeBtn = document.getElementById("closeModal");
 
-        // Function to set the tick position on the line
-        function setTickPosition(fakePercent) {
-            const gradientLine = document.getElementById("gradientLine");
-            const tick = document.getElementById("tick");
+    infoButton.onclick = function() {
+      infoModal.style.display = "block";
+    };
 
-            // Calculate the position of the tick based on the fake_percent
-            const position = (fakePercent / 100) * gradientLine.offsetWidth;
+    closeBtn.onclick = function() {
+      infoModal.style.display = "none";
+    };
 
-            // Set the tick position (this is in pixels)
-            tick.style.left = `${position}px`;
-        }
-    </script>
+    window.onclick = function(event) {
+      if (event.target == infoModal) {
+        infoModal.style.display = "none";
+      }
+    };
+  </script>
 </body>
 </html>

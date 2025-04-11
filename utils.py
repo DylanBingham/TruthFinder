@@ -7,9 +7,11 @@ import numpy as np
 import pandas as pd
 import nltk
 import re
+import pickle
 import textstat
 import string
 import unicodedata
+
 
 ######## App Configuration and Setup #########
 # Download necessary NLTK resources
@@ -17,8 +19,38 @@ nltk.download('punkt_tab')
 # Load the pre-fitted models (adjust the file paths as needed)
 tfidf_vectorizer = joblib.load('tfidf_vectorizer.joblib')
 pca_model = joblib.load('pca_model.joblib')
-rf_model = joblib.load('data/best_rf_model.pkl') # Update as needed per your project structure
+rf_model = joblib.load('best_rf_model.pkl') # Update as needed per your project structure
 ##############################################
+def setup_input_articles():
+    
+        
+    title1 = "MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"
+    text1 = """
+
+    MOSCOW Reuters - The U.S. embassy in Moscow accused Russian authorities on Monday of barring diplomatic staff from a property on the outskirts of Moscow, after having earlier agreed to grant access until midday on Tuesday for them to retrieve belongings. A Russian foreign ministry official, quoted by state news agency RIA, said the U.S. embassy had sent in its trucks without first obtaining permits which, the official said, are required by law because the property is in a conservation area.  The property, in a picturesque spot on a bend in the Moskva river northwest of the capital, is leased by the U.S. embassy for its staff to use for recreation.  Moscow has said it is taking it back as part of retaliatory measures after Washington approved a fresh round of sanctions against Russia. A Reuters TV cameraman outside the country residence, known in Russian as a dacha, saw five vehicles with diplomatic license plates, including a truck, arrive at the site. He said they were denied entry. An embassy spokeswoman said In line with the Russian government notification, the U.S. Mission to Russia was supposed to have access to our dacha until noon on Aug. 1.  We have not had access all day today or yesterday, she said. We refer you to the Russian government to explain why not. The Russian foreign ministry official, who was not identified, said the Americans were to blame for failing to obtain the necessary permits. To accuse Russia of blocking access amounts to a pre-meditated provocation, RIA news agency cited the official as saying.  
+    """
+    title2 = "MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"
+    text2 = """
+
+    MOSCOW Reuters - The U.S. embassy in Moscow accused Russian authorities on Monday of barring diplomatic staff from a property on the outskirts of Moscow, after having earlier agreed to grant access until midday on Tuesday for them to retrieve belongings. A Russian foreign ministry official, quoted by state news agency RIA, said the U.S. embassy had sent in its trucks without first obtaining permits which, the official said, are required by law because the property is in a conservation area.  The property, in a picturesque spot on a bend in the Moskva river northwest of the capital, is leased by the U.S. embassy for its staff to use for recreation.  Moscow has said it is taking it back as part of retaliatory measures after Washington approved a fresh round of sanctions against Russia. A Reuters TV cameraman outside the country residence, known in Russian as a dacha, saw five vehicles with diplomatic license plates, including a truck, arrive at the site. He said they were denied entry. An embassy spokeswoman said In line with the Russian government notification, the U.S. Mission to Russia was supposed to have access to our dacha until noon on Aug. 1.  We have not had access all day today or yesterday, she said. We refer you to the Russian government to explain why not. The Russian foreign ministry official, who was not identified, said the Americans were to blame for failing to obtain the necessary permits. To accuse Russia of blocking access amounts to a pre-meditated provocation, RIA news agency cited the official as saying.  
+    """
+    title3 = "MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"
+    text3 = """
+
+    MOSCOW Reuters - The U.S. embassy in Moscow accused Russian authorities on Monday of barring diplomatic staff from a property on the outskirts of Moscow, after having earlier agreed to grant access until midday on Tuesday for them to retrieve belongings. A Russian foreign ministry official, quoted by state news agency RIA, said the U.S. embassy had sent in its trucks without first obtaining permits which, the official said, are required by law because the property is in a conservation area.  The property, in a picturesque spot on a bend in the Moskva river northwest of the capital, is leased by the U.S. embassy for its staff to use for recreation.  Moscow has said it is taking it back as part of retaliatory measures after Washington approved a fresh round of sanctions against Russia. A Reuters TV cameraman outside the country residence, known in Russian as a dacha, saw five vehicles with diplomatic license plates, including a truck, arrive at the site. He said they were denied entry. An embassy spokeswoman said In line with the Russian government notification, the U.S. Mission to Russia was supposed to have access to our dacha until noon on Aug. 1.  We have not had access all day today or yesterday, she said. We refer you to the Russian government to explain why not. The Russian foreign ministry official, who was not identified, said the Americans were to blame for failing to obtain the necessary permits. To accuse Russia of blocking access amounts to a pre-meditated provocation, RIA news agency cited the official as saying.  
+    """
+
+    title4 = "MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"
+    text4 = """
+
+    MOSCOW Reuters - The U.S. embassy in Moscow accused Russian authorities on Monday of barring diplomatic staff from a property on the outskirts of Moscow, after having earlier agreed to grant access until midday on Tuesday for them to retrieve belongings. A Russian foreign ministry official, quoted by state news agency RIA, said the U.S. embassy had sent in its trucks without first obtaining permits which, the official said, are required by law because the property is in a conservation area.  The property, in a picturesque spot on a bend in the Moskva river northwest of the capital, is leased by the U.S. embassy for its staff to use for recreation.  Moscow has said it is taking it back as part of retaliatory measures after Washington approved a fresh round of sanctions against Russia. A Reuters TV cameraman outside the country residence, known in Russian as a dacha, saw five vehicles with diplomatic license plates, including a truck, arrive at the site. He said they were denied entry. An embassy spokeswoman said In line with the Russian government notification, the U.S. Mission to Russia was supposed to have access to our dacha until noon on Aug. 1.  We have not had access all day today or yesterday, she said. We refer you to the Russian government to explain why not. The Russian foreign ministry official, who was not identified, said the Americans were to blame for failing to obtain the necessary permits. To accuse Russia of blocking access amounts to a pre-meditated provocation, RIA news agency cited the official as saying.  
+    """
+    d = {title1:text1,title2:text2,title3:text3,title4:text4}
+    with open("article_text.pkl", "wb") as file:
+        pickle.dump(d, file)
+        
+    return
+    
 
 # Define function to clean text
 def clean_text(text, lower_text: bool = False, remove_whitespace: bool = False, fix_encoding: bool = True, tokenize: bool = False):
@@ -133,6 +165,11 @@ def extract_features_from_article(article_text):
     ]
     feature_vector = [features[col] for col in feature_order]
     feature_vector = np.array(feature_vector).reshape(1, -1)
+    
+    #Notes from Kevin: Vedant The next step I need you to do is transform the data from prediction to 
+    # the front end. Use examples of how I get the features to appear on the front end
+    # and take the same approach. Right now the global_resp_data variable in app.py has static numbers for outputs
+    
     
     # 6. Use the RF model to generate a prediction
     prediction = rf_model.predict_proba(feature_vector)
