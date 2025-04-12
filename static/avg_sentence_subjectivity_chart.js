@@ -101,15 +101,15 @@ function createAvgSentenceSubjectivityChart(data, verticalLinePosition) {
         .range([config.height, 0]);
     
     // Create bars with explicit styling
-    svg.selectAll("rect")
-        .data(bins)
-        .enter().append("rect")
-        .attr("x", d => x(d.x0) + 1)
-        .attr("y", d => y(d.length / filteredData.length))
-        .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-        .attr("height", d => config.height - y(d.length / filteredData.length))
-        .attr("fill", "#4e79a7") // Distinct blue color
-        .attr("opacity", 0.7);
+    // svg.selectAll("rect")
+    //     .data(bins)
+    //     .enter().append("rect")
+    //     .attr("x", d => x(d.x0) + 1)
+    //     .attr("y", d => y(d.length / filteredData.length))
+    //     .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+    //     .attr("height", d => config.height - y(d.length / filteredData.length))
+    //     .attr("fill", "#4e79a7") // Distinct blue color
+    //     .attr("opacity", 0.7);
     
     const line = d3.line()
         .x(d => x(d[0]))

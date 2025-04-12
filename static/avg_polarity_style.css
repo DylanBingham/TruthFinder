@@ -488,5 +488,5 @@
 #avg-sentence-polarity-chart svg {
   position: relative;
   z-index: 1;
-  margin-top: -40px; /* Pulls chart up to meet scale */
+  margin-top: -10px; /* Pulls chart up to meet scale */
 }
