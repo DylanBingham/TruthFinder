@@ -9,9 +9,9 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
 
     // Configuration - now based on container dimensions
     const config = {
-        width: containerWidth - 40, // Account for padding
+        width: containerWidth - 60, // Account for padding
         height: containerHeight - 40,
-        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        margin: { top: 30, right: 20, bottom: 40, left: 50 }, // Reduced margins
         numBins: 30, // Reduced number of bins for smaller containers
         kdePoints: 500,
         verticalLine: {

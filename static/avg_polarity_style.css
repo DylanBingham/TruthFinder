@@ -484,9 +484,3 @@
     margin-top: 8px;
     font-style: italic;
 }
-
-#avg-sentence-polarity-chart svg {
-  position: relative;
-  z-index: 1;
-  margin-top: -10px; /* Pulls chart up to meet scale */
-}

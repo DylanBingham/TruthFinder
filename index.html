@@ -14,6 +14,8 @@
   <script src="/static/num_speech_attributes_chart.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <link rel="stylesheet" href="/static/avg_polarity_style.css" />
+  <link rel="stylesheet" href="/static/analysis_results.css" />
+  <link rel="stylesheet" href="/static/floating_legend.css" />
 
   <style>
     /* CSS Variables for consistent styling */
@@ -158,7 +160,7 @@
     .gradient-line {
       width: 100%;
       height: 20px;
-      background: linear-gradient(to right, lightgreen, darkred);
+      background: linear-gradient(to right,  darkred, lightgreen);
       position: relative;
       border-radius: 10px;
       overflow: hidden;
@@ -249,20 +251,24 @@
     }
     /* Chart Container Styling */
     .chart-container {
-      width: 100%; /* Full width of the grid cell */
-      height: 500px; /* Keep height as before */
+      width: 95%; /* Full width of the grid cell */
+      height: auto; /* Keep height as before */
       margin: 10px -10px;
       border: 1px solid #ddd;
       border-radius: 12px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      padding: 10px;
+      padding: 20px;
       background-color: var(--card-bg);
       position: relative;
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
-    .axis-label,
+    .axis-label {
+      font-size: 11px;
+      font-family: "Open Sans", sans-serif;
+      margin-right: auto;
+    }
     .chart-title {
       font-size: 14px;
       font-family: "Open Sans", sans-serif;
@@ -284,8 +290,8 @@
       width: 150px;    /* sets the width of the button */
       height: 80px;
       position: fixed;
-      top: 115px;
-      left: 5px;
+      top: 125px;
+      left: 10px;
       z-index: 1100;
       background-color: var(--primary-color);
       border: none;
@@ -333,14 +339,7 @@
       color: #000;
       text-decoration: none;
     }
-    
-    .chart-container {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      height: auto; /* Let content determine height */
-    }
-    
+        
     /* Scale container styling */
     .polarity-scale,
     .subjectivity-scale,
@@ -356,7 +355,7 @@
       margin-bottom: 15px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       padding: 15px;
-      margin-bottom: -10px; /* Overlap slightly with chart */
+      margin-bottom: 10px; /* Overlap slightly with chart */
     }
     
     
@@ -430,6 +429,8 @@
       order: 2;
       z-index: 1;
       height: 300px;
+      overflow: visible;
+      box-sizing: border-box;
     }
     .scale-indicator {
       z-index: 3;
@@ -478,18 +479,43 @@
     </div>
   </div>
 
+  <!-- Floating legend container -->
+  <div class="floating-legend">
+    <h4>Legend</h4>
+    <div class="legend-item">
+      <span class="legend-color green-line"></span>
+      <span class="legend-label">True</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color red-line"></span>
+      <span class="legend-label">Fake</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color dashed-line"></span>
+      <span class="legend-label">Selection</span>
+    </div>
+  </div>
+
   <div class="container">
     <h2 style="font-size: 2em;">Select an Article to be Analyzed</h2>
     <select id="urlInput">
-      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
-      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
-      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
-      <option value="MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral"> MICHELLE OBAMA Breaks Church Rules Wearing Revealing Top Into Siena Cathedral </option>
+      <option value="Trump tariffs live updates: Stocks tumble; House adopts Republican budget"> Trump tariffs live updates: Stocks tumble; House adopts Republican budget </option>
+       <option value="These are the House Republicans running for speaker"> These are the House Republicans running for speaker </option>
+       <option value="Supreme Court says Trump admin must 'facilitate' release of man wrongly deported to El Salvador prison"> Supreme Court says Trump admin must 'facilitate' release of man wrongly deported to El Salvador prison </option>
+       <option value="Michelle Obama addresses recent absences from political events and divorce rumors"> Michelle Obama addresses recent absences from political events and divorce rumors </option>
+       <option value="These are the House Republicans running for speaker"> These are the House Republicans running for speaker </option>
+       <option value="Uncertainty looms for future aid to Ukraine and Israel as speaker drama continues"> Uncertainty looms for future aid to Ukraine and Israel as speaker drama continues </option>
+       <option value="5-4 Supreme Court allows Trump to freeze roughly $65 million in teacher training grants"> 5-4 Supreme Court allows Trump to freeze roughly $65 million in teacher training grants </option>
+       <option value="Top federal labor officials reinstated by full DC federal appeals court "> Top federal labor officials reinstated by full DC federal appeals court </option>
+       <option value="Fact check: Trump’s barrage of lies about Zelensky and Ukraine "> Fact check: Trump’s barrage of lies about Zelensky and Ukraine </option>  
+       <option value="South Sudan rescinds its decision to deny a deportee entry after the US revokes visas"> South Sudan rescinds its decision to deny a deportee entry after the US revokes visas</option>
+       <option value="What just happened with Trump’s tariffs? He paused some tariffs — and then escalated a trade war with China."> What just happened with Trump’s tariffs? He paused some tariffs — and then escalated a trade war with China. </option>
     </select>
     <button onclick="saveToServer()">Save</button>
     <p id="responseMessage"></p>
     <!-- Output Section (initially hidden) -->
     <div id="outputSection" style="display: none; padding: 5px; font-size: 1.8em;">
+      <hr class="section-divider">
       <h3>Analysis Results</h3>
       <div id="outputData"></div>
       <div class="metrics-grid" id="metricsDisplay"></div>
@@ -537,11 +563,10 @@
         if (!data || !data.length) throw new Error("No data available");
         const result = data[0];
         document.getElementById("outputData").innerHTML = `
-          <div class="result-summary">
-            <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
+          <div class="analysis-results-card">
+            <h3>Credibility Score: <span class="score">${Number(result.fake_percent).toFixed(2)}%</span>
             <span class="verdict-badge">${result.fake_percent_display}</span>
             </h3>
-            <p>Confidence: ${(result.confidence)}</p>
             <div class="gradient-line" id="gradientLine">
               <div class="tick" id="tick"></div>
             </div>

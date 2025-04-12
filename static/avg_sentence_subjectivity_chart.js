@@ -9,9 +9,9 @@ function createAvgSentenceSubjectivityChart(data, verticalLinePosition) {
 
     // Configuration - now based on container dimensions
     const config = {
-        width: containerWidth - 40, // Account for padding
+        width: containerWidth - 60, // Account for padding
         height: containerHeight - 40,
-        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        margin: { top: 30, right: 20, bottom: 40, left: 50 }, // Reduced margins
         numBins: 30, // Reduced number of bins for smaller containers
         kdePoints: 500,
         verticalLine: {
@@ -184,19 +184,27 @@ function createAvgSentenceSubjectivityChart(data, verticalLinePosition) {
     
     // Simplified labels
     svg.append("text")
+        .attr("class", "axis-label")
         .attr("x", config.width / 2)
         .attr("y", config.height + 30)
         .style("text-anchor", "middle")
-        .style("font-size", "10px")
         .text("Subjectivity Score (0 to 1)");
     
     svg.append("text")
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("x", -config.height / 2)
-        .attr("y", -25)
+        .attr("y", -config.margin.left + 15)
         .style("text-anchor", "middle")
-        .style("font-size", "10px")
         .text("Density");
+
+    // Add title
+    svg.append("text")
+        .attr("class", "chart-title")
+        .attr("x", config.width / 2)
+        .attr("y", -config.margin.top / 2)
+        .style("text-anchor", "middle")
+        .text("Distribution of Avg. Subjectivity");
 }
 
 // Kernel Density Estimation functions (unchanged)

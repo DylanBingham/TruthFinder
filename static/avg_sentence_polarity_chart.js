@@ -8,9 +8,9 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
 
     // Config with proper dimensions accounting for margins
     const config = {
-        width: containerWidth - 40, // Account for padding
+        width: containerWidth - 60, // Account for padding
         height: containerHeight - 40,
-        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        margin: { top: 30, right: 20, bottom: 40, left: 50 }, // Reduced margins
         numBins: 30, // Reduced number of bins for smaller containers
         kdePoints: 500,
         verticalLine: {
@@ -180,19 +180,27 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
     
     // Simplified labels - adjusted to account for margins
     svg.append("text")
+        .attr("class", "axis-label")
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10) // Adjusted for bottom margin
         .style("text-anchor", "middle")
-        .style("font-size", "10px")
         .text("Polarity Score (-1 to 1)");
     
     svg.append("text")
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("x", -config.height / 2)
         .attr("y", -config.margin.left + 15) // Adjusted for left margin
         .style("text-anchor", "middle")
-        .style("font-size", "10px")
         .text("Density");
+
+    // Add title
+    svg.append("text")
+        .attr("class", "chart-title")
+        .attr("x", config.width / 2)
+        .attr("y", -config.margin.top / 2)
+        .style("text-anchor", "middle")
+        .text("Distribution of Avg. Polarity");
 }
 
 // Kernel Density Estimation functions (unchanged)
