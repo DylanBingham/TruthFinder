@@ -418,25 +418,30 @@
       <span id="closeModal" class="close">&times;</span>
       <h3>Information</h3>
       <p>
-        <strong>Polarity:</strong> the overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.
+        <strong>Credibility Score::</strong> The pred score represents the model’s confidence that a given statement or hypothesis is true. It ranges from 0 to 1, where values closer to 0 indicate a low likelihood of truth, and values closer to 1 indicate a high likelihood. This score can be interpreted using qualitative descriptors to aid understanding, such as "unlikely to be true" or "very likely to be true."
       </p>
       <p>
-        <strong>Subjectivity:</strong> the overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.
+        <strong>Polarity:</strong> refers to the overall sentiment of an article, measured on a scale from -1 to 1. A score closer to -1 indicates a completely negative tone, while a score near 1 represents a completely positive one. This metric provides a high-level understanding of the emotional attitude conveyed throughout the article.
       </p>
       <p>
-        <strong>Avg Polarity:</strong> the average polarity of the article's sentences. A more fine-grained measure of polarity.
+        <strong>Subjectivity:</strong> captures how much an article expresses personal opinions versus factual information. It ranges from 0 to 1, where 0 indicates a highly objective, fact-based article, and 1 indicates a highly subjective or opinion-driven piece. This helps assess whether the article is more informative or expressive in nature.
       </p>
       <p>
-        <strong>Avg Subjectivity:</strong> the average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.
+        <strong>Avg Polarity:</strong> represents the mean sentiment score calculated across all individual sentences in the article. Unlike the overall polarity, this provides a more granular view of sentiment, revealing subtle shifts in emotional tone throughout the text.
       </p>
       <p>
-        <strong>Word Count:</strong> the length of an article.
+        <strong>Avg Subjectivity:</strong> is the average of the subjectivity scores for each sentence in the article. This metric offers a detailed look at how opinionated or objective the content is on a sentence-by-sentence basis, allowing for a more nuanced understanding of the article’s perspective.
       </p>
       <p>
-        <strong>Quotes:</strong> an approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.
+        <strong>Word Count:</strong> simply denotes the total number of words in the article. It serves as a basic measure of the article’s length and can also indirectly relate to the depth or breadth of the content.
       </p>
       <p>
-        <strong>Flesch Reading Ease:</strong> a measure of text readability based on text length and syllabic content. Difficult to Read = 1, Easy to Read = 100.
+        <strong>Quotes:</strong> estimate the number of reported speech instances in the article. This is approximated by counting the occurrences of speech-related verbs such as “said,” “say,” “told,” and “tell.” It provides insight into how much of the article is based on direct quotations or attributed dialogue.
+      </p>
+      <p>
+        <strong>Flesch Reading Ease:</strong> is a readability score that evaluates how easy the article is to read. It is calculated based on sentence length and syllable complexity, with a range from 1 (very difficult to read) to 100 (very easy to read). Higher scores suggest simpler, more accessible language, while lower scores imply a more complex writing style.
+
+
       </p>
     </div>
   </div>
@@ -511,7 +516,6 @@
             <h3>Credibility Score: <span class="score">${result.fake_percent}%</span>
             <span class="verdict-badge">${result.fake_percent_display}</span>
             </h3>
-            <p>Confidence: ${(result.confidence)}</p>
             <div class="gradient-line" id="gradientLine">
               <div class="tick" id="tick"></div>
             </div>

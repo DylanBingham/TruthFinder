@@ -115,67 +115,31 @@ def save_url():
   
 
 
-    def calculate_confidence(polarity, subjectivity, word_count, quotes, flesch_reading_ease):
-        """
-        Calculate an overall confidence score based on five parameters:
-        
-        - polarity: [-1, 1], where 0 is most balanced.
-        - subjectivity: [0, 1], where 0 is factual.
-        - word_count: total number of words (benchmark: 1000 words for maximum contribution).
-        - quotes: count of quotation signals (benchmark: 20 quotes for maximum contribution).
-        - flesch_reading_ease: [1, 100], where 100 is easiest to read.
-        
-        Returns:
-        overall_confidence (float): Combined confidence score between 0 and 1.
-        descriptor (str): A brief descriptive string.
-        """
-        # Normalize each parameter:
-        polarity_factor = 1 - abs(polarity)             # Best if sentiment is neutral.
-        subjectivity_factor = 1 - subjectivity           # Best if content is factual.
-        
-        # We assume that 1000 words is our benchmark for a full score.
-        normalized_word_count = min(1.0, word_count / 1000.0)
-        
-        # We assume that 20 quotes would be excellent; adjust as needed.
-        normalized_quotes = min(1.0, quotes / 20.0)
-        
-        # Normalize Flesch Reading Ease so that a score of 1 maps to 0 and 100 maps to 1.
-        normalized_readability = (flesch_reading_ease - 1) / 99.0
-        
-        # Compute the overall confidence as an equally weighted average.
-        overall_confidence = (polarity_factor +
-                            subjectivity_factor +
-                            normalized_word_count +
-                            normalized_quotes +
-                            normalized_readability) / 5
-        
-        overall_confidence = round(overall_confidence, 2)  # Round to two decimal places for clarity.
+    def calculate_confidence(pred):
         # Map the overall score to a confidence descriptor.
-        if overall_confidence < 0.2:
-            descriptor = "extremely low confidence"
-        elif overall_confidence < 0.4:
-            descriptor = "low confidence"
-        elif overall_confidence < 0.6:
-            descriptor = "moderate confidence"
-        elif overall_confidence < 0.8:
-            descriptor = "high confidence"
+        if pred < 0.2:
+            descriptor = "It is extremely unlikely to be true."
+        elif pred < 0.4:
+            descriptor = "It is unlikely to be true."
+        elif pred < 0.6:
+            descriptor = "It is somewhat likely to be true."
+        elif pred < 0.8:
+            descriptor = "It is likely to be true."
         else:
-            descriptor = "very high confidence"
+            descriptor = "It is very likely to be true."
         
-
-        return overall_confidence, descriptor
+        return descriptor
     
 
-    confidence_score, confidence_string = calculate_confidence( round(f['overall_polarity'], 2), round(f['overall_subjectivity'], 2), round(f['word_count'], 0), round(f['num_speech_attributes'], 0), round(f['flesch_reading_ease'], 0))
+    confidence_string = calculate_confidence( pred )
 
-    logging.info(f"Confidence Score: {confidence_score}")
     logging.info(f"Confidence String: {confidence_string}")
 
     global_resp_data = [
         {
-            "fake_percent": pred*100,  
+            "fake_percent": round(pred*100,2),  
             "fake_percent_display": confidence_string, 
-            "confidence": confidence_score,
+            "confidence": 0,
             "last_updated": current_time.isoformat(),
             "polarity_score": round(f['overall_polarity'],2),
             "subjectivity_score": round(f['overall_subjectivity'],2),

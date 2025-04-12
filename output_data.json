@@ -1,9 +1,9 @@
 [
     {
-        "fake_percent": 79.17857142857143,
-        "fake_percent_display": "high confidence",
-        "confidence": 0.75,
-        "last_updated": "2025-04-11T19:29:40.274023",
+        "fake_percent": 79.18,
+        "fake_percent_display": "It is likely to be true.",
+        "confidence": 0,
+        "last_updated": "2025-04-12T13:51:21.206528",
         "polarity_score": 0.14,
         "subjectivity_score": 0.42,
         "avg_polarity": 0.11,
