@@ -118,16 +118,16 @@ def save_url():
     def calculate_confidence(pred):
         # Map the overall score to a confidence descriptor.
         if pred < 0.2:
-            descriptor = "It is very unlikely to be true."
+            descriptor = "It is very unlikely to be credible."
         elif pred < 0.4:
-            descriptor = "It is unlikely to be true."
+            descriptor = "It is unlikely to be credible."
         elif pred < 0.6:
-            descriptor = "It is somewhat likely to be true."
+            descriptor = "It is somewhat likely to be credible."
         elif pred < 0.8:
-            descriptor = "It is likely to be true."
+            descriptor = "It is likely to be credible."
         else:
-            descriptor = "It is very likely to be true."
-        
+            descriptor = "It is very likely to be credible."
+                
         return descriptor
     
 
