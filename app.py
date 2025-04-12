@@ -15,13 +15,14 @@ app = Flask(__name__)
 CORS(app)
 
 from utils import (
-    extract_features_from_article
+    extract_features_from_article, setup_input_articles
 )
 
 import datetime
 import json
 import os
 
+setup_input_articles()
 
 app = Flask(__name__)
 CORS(app)
@@ -33,27 +34,31 @@ articles = {
 }
 
 # Define a route to extract features for an article specified by title or URL
-# @app.route('/extract_features', methods=['POST'])
-# def extract_features_route():
-#     logging.debug("Received request to extract features.")
-#     data = request.get_json()
-#     logging.debug(f"Request data: {data}")
-#     article_title = data.get("article_title")
-#     url = data.get("url")
+@app.route('/extract_features', methods=['POST'])
+def extract_features_route():
+    logging.debug("Received request to extract features.")
+    data = request.get_json()
+    logging.debug(f"Request data: {data}")
+    article_title = data.get("article_title")
+    url = data.get("url")
     
-#     # Lookup the article text using the provided article_title or url
-#     if article_title and article_title in articles:
-#         article_text = articles[article_title]
-#     elif url and url in articles:
-#         article_text = articles[url]
-#     else:
-#         logging.warning("Article not found.")
-#         return jsonify({"error": "Article not found."}), 404
+    print(f"Article title: {article_title}")
+    print(f"URL: {url}")
+    print(f"rticle_text: {article_text}")
 
-#     # Extract features from the article text
-#     features = extract_features_from_article(article_text)
-#     logging.debug(f"Extracted features: {features}")
-#     return jsonify(features)
+    # Lookup the article text using the provided article_title or url
+    if article_title and article_title in articles:
+        article_text = articles[article_title]
+    elif url and url in articles:
+        article_text = articles[url]
+    else:
+        logging.warning("Article not found.")
+        return jsonify({"error": "Article not found."}), 404
+
+    # Extract features from the article text
+    features = extract_features_from_article(article_text)
+    logging.debug(f"Extracted features: {features}")
+    return jsonify(features)
 
 
 # Serve index.html at the root URL
