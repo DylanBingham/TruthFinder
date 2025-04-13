@@ -64,6 +64,8 @@ def serve_index():
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
+    if filename.endswith('.csv'):
+        return send_from_directory('static', filename, mimetype='text/csv')
     return send_from_directory('static', filename)
 
 
@@ -110,7 +112,7 @@ def save_url():
   
 
 
-    def calculate_confidence(polarity, subjectivity, word_count, quotes, flesch_reading_ease):
+    def calculate_confidence(polarity, subjectivity, word_count, quotes, flesch_reading_ease, pred: int):
         """
         Calculate an overall confidence score based on five parameters:
         
@@ -144,24 +146,24 @@ def save_url():
                             normalized_quotes +
                             normalized_readability) / 5
         
-        overall_confidence = round(overall_confidence, 2)  # Round to two decimal places for clarity.
+        overall_confidence = round(pred, 2)  # Round to two decimal places for clarity.
         # Map the overall score to a confidence descriptor.
-        if overall_confidence < 0.2:
-            descriptor = "extremely low confidence"
+        if overall_confidence < 0.25:
+            descriptor = "very low credibility"
         elif overall_confidence < 0.4:
-            descriptor = "low confidence"
-        elif overall_confidence < 0.6:
-            descriptor = "moderate confidence"
-        elif overall_confidence < 0.8:
-            descriptor = "high confidence"
+            descriptor = "low credibility"
+        elif overall_confidence < 0.7:
+            descriptor = "moderate credibility"
+        elif overall_confidence < 0.85:
+            descriptor = "high credibility"
         else:
-            descriptor = "very high confidence"
+            descriptor = "very high credibility"
         
 
         return overall_confidence, descriptor
     
 
-    confidence_score, confidence_string = calculate_confidence( round(f['overall_polarity'], 2), round(f['overall_subjectivity'], 2), round(f['word_count'], 0), round(f['num_speech_attributes'], 0), round(f['flesch_reading_ease'], 0))
+    confidence_score, confidence_string = calculate_confidence( round(f['overall_polarity'], 2), round(f['overall_subjectivity'], 2), round(f['word_count'], 0), round(f['num_speech_attributes'], 0), round(f['flesch_reading_ease'], 0), pred)
 
     logging.info(f"Confidence Score: {confidence_score}")
     logging.info(f"Confidence String: {confidence_string}")

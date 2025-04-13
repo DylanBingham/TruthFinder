@@ -47,7 +47,7 @@
   /* Dashed line example */
   .dashed-line {
     width: 0;
-    height: 20px;
+    height: 15px;
     border-left: 2px dashed #ff5733;
     margin-right: 8px;
     }

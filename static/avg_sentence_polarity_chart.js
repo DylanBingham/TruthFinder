@@ -41,6 +41,7 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
         .attr("height", config.height + config.margin.top + config.margin.bottom)
         .append("g")
         .attr("transform", `translate(${config.margin.left},${config.margin.top})`);
+
         
     // Create defs if they don't exist
     if (svg.select("defs").empty()) {
@@ -201,6 +202,7 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
         .attr("y", -config.margin.top / 2)
         .style("text-anchor", "middle")
         .text("Distribution of Avg. Polarity");
+
 }
 
 // Kernel Density Estimation functions (unchanged)

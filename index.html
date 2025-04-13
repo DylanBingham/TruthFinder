@@ -128,6 +128,24 @@
       margin-left: 8px;
       vertical-align: middle;
     }
+
+    .chart-loading-spinner {
+      /* Temporary border to find it */
+      border: 2px solid red;
+      /* Temporary border to find it */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8); /* semi-transparent overlay */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000; /* make sure it sits on top of other chart elements */
+    }
+
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -245,10 +263,27 @@
       display: inline-block;
       padding: 4px 8px;
       background-color: var(--accent-color);
-      border-radius: 4px;
+      border-radius: 9999px;
       font-weight: 600;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* subtle drop shadow */
       margin-left: 8px;
     }
+
+    /* Dynamic classes based on credibility */
+    .high-credibility {
+      background-color: #4caf50; /* Green */
+    }
+
+    .medium-credibility {
+      background-color: #ffc107; /* Amber */
+    }
+
+    .low-credibility {
+      background-color: #f44336; /* Red */
+    }
+
     /* Chart Container Styling */
     .chart-container {
       width: 95%; /* Full width of the grid cell */
@@ -288,7 +323,7 @@
     /* Reduced-size fixed button in the top left corner */
     #infoButton {
       width: 150px;    /* sets the width of the button */
-      height: 80px;
+      height: 60px;
       position: fixed;
       top: 125px;
       left: 10px;
@@ -428,6 +463,7 @@
     .chart-svg-container {
       order: 2;
       z-index: 1;
+      position: relative;
       height: 300px;
       overflow: visible;
       box-sizing: border-box;
@@ -484,15 +520,15 @@
     <h4>Legend</h4>
     <div class="legend-item">
       <span class="legend-color green-line"></span>
-      <span class="legend-label">True</span>
+      <span class="legend-label">True Articles</span>
     </div>
     <div class="legend-item">
       <span class="legend-color red-line"></span>
-      <span class="legend-label">Fake</span>
+      <span class="legend-label">Fake Articles</span>
     </div>
     <div class="legend-item">
       <span class="legend-color dashed-line"></span>
-      <span class="legend-label">Selection</span>
+      <span class="legend-label">Selected Article</span>
     </div>
   </div>
 
@@ -523,6 +559,23 @@
   </div>
 
   <script>
+    let globalD3Data = null;
+    
+    // Load CSV data when page loads
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('Preloading D3 CSV data...');
+        d3.csv("static/final_dataset_with_pca_d3.csv")
+            .then(data => {
+                console.log('D3 CSV data preloaded successfully', {
+                    rowCount: data.length
+                });
+                globalD3Data = data;
+            })
+            .catch(error => {
+                console.error('Error preloading D3 CSV data:', error);
+            });
+    });
+
     async function saveToServer() {
       const url = document.getElementById("urlInput").value;
       if (url.trim() === "") {
@@ -533,6 +586,7 @@
       document.getElementById("outputSection").style.display = "none";
       const spinner = document.createElement("div");
       spinner.className = "loading-spinner";
+      spinner.id = "globalSpinner";
       document.getElementById("responseMessage").appendChild(spinner);
       try {
         const [response] = await Promise.all([
@@ -544,28 +598,59 @@
           new Promise((resolve) => setTimeout(resolve, 5000)),
         ]);
         const result = await response.json();
+        fetchOutputData();
         document.getElementById("responseMessage").innerText = `Analysis complete for: ${url}`;
         document.getElementById("outputSection").style.display = "block";
-        fetchOutputData();
       } catch (error) {
         document.getElementById("responseMessage").innerText = `Error analyzing URL: ${error.message}`;
-      } finally {
         const spinner = document.querySelector(".loading-spinner");
         if (spinner) spinner.remove();
       }
     }
 
+    
     async function fetchOutputData() {
+      // Clear previous outputs from outputData and metricsDisplay (if needed)
+      document.getElementById("outputData").innerHTML = "";
+      document.getElementById("metricsDisplay").innerHTML = "";
+      
+      // (Optionally) Reuse the existing spinner. If it's already in place (from saveToServer),
+      // you can just leave it until this function completes.
+      
+      let spinner = document.getElementById("globalSpinner");
+      if (!spinner) {
+        // If not present, create a spinner (fallback)
+        spinner = document.createElement("div");
+        spinner.className = "loading-spinner";
+        spinner.id = "globalSpinner";
+        document.getElementById("outputData").appendChild(spinner);
+      }
+      console.log('Starting fetchOutputData()');
       try {
+        console.log('Attempting to fetch data from /get_output');
         const response = await fetch("http://127.0.0.1:5000/get_output");
         const data = await response.json();
+        console.log('Received data:', { 
+          status: response.status,
+          dataLength: data?.length,
+          firstResult: data?.[0] 
+        });
+
         if (!response.ok) throw new Error(data.error || "Server error");
         if (!data || !data.length) throw new Error("No data available");
+
         const result = data[0];
+        console.log('Processing result with metrics:', {
+          fake_percent: result.fake_percent,
+          avg_polarity: result.avg_polarity,
+          avg_subjectivity: result.avg_subjectivity
+        });
+
+        
         document.getElementById("outputData").innerHTML = `
           <div class="analysis-results-card">
             <h3>Credibility Score: <span class="score">${Number(result.fake_percent).toFixed(2)}%</span>
-            <span class="verdict-badge">${result.fake_percent_display}</span>
+            <span id="verdictBadge" class="verdict-badge">${result.fake_percent_display}</span>
             </h3>
             <div class="gradient-line" id="gradientLine">
               <div class="tick" id="tick"></div>
@@ -573,171 +658,179 @@
           </div>
         `;
         setTickPosition(result.fake_percent);
-        d3.csv("static/final_dataset_with_pca_d3.csv")
-          .then((data) => {
-            createFleschReadingEaseChart(data, result.flesch_reading_ease);
-            createWordCountChart(data, result.word_count);
-            createOverallPolarityChart(data, result.polarity_score);
-            createOverallSubjectivityChart(data, result.subjectivity_score);
-            createAvgSentencePolarityChart(data, result.avg_polarity);
-            createAvgSentenceSubjectivityChart(data, result.avg_subjectivity);
-            createNumSpeechAttributesChart(data, result.num_quotes);
-          })
-          .catch((error) => {
-            console.error("Error loading the data:", error);
-          });
-          document.getElementById("metricsDisplay").innerHTML = `
-                <div class="metric-card">
-                    <h4>Avg. Polarity</h4>
-                    <div class="metric-value">${result.avg_polarity}</div>
-                        <div id="avg-sentence-polarity-chart" class="chart-container">
-                          <!-- Scale container (won't be cleared by D3) -->
-                          <div class="subjectivity-scale">
-                            <div class="scale-track"></div>
-                            <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
-                              <div class="indicator-line"></div>
-                              <div class="indicator-dot"></div>
-                            </div>
-                            <div class="scale-label scale-label-0">-1</div>
-                            <div class="scale-label scale-label-1">1</div>
-                            <div class="scale-instruction">Hover over ends of scale</div>
-                          </div>
-                          <!-- Chart will be inserted here -->
-                          <div class="chart-svg-container"></div>
-                        </div>
-                    <span class="tooltip">The overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.</span>
-                </div>
-                                    
-                <div class="metric-card">
-                    <h4>Avg. Subjectivity</h4>
-                    <div class="metric-value">${result.avg_subjectivity}</div>
-                    <div id="avg-sentence-subjectivity-chart" class="chart-container">
-                        <!-- Scale container -->
+
+        // Use preloaded data if available, otherwise load it
+        const chartData = globalD3Data || await d3.csv("static/final_dataset_with_pca_d3.csv");
+        console.log('Defined variable chartData:', {
+          chartDataLength: chartData.length,
+          chartDataFirstRow: chartData[0]
+        });
+         
+        document.getElementById("metricsDisplay").innerHTML = `
+              <div class="metric-card">
+                  <h4>Avg. Polarity</h4>
+                  <div class="metric-value">${result.avg_polarity}</div>
+                      <div id="avg-sentence-polarity-chart" class="chart-container">
+                        <!-- Scale container (won't be cleared by D3) -->
                         <div class="subjectivity-scale">
-                            <!-- The scale track - blue gradient for objectivity/subjectivity -->
-                            <div class="scale-track"></div>
-                            
-                            <!-- The indicator for the current value -->
-                            <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
-                              <div class="indicator-line"></div>
-                              <div class="indicator-dot"></div>
-                            </div>
-                            <div class="scale-label scale-label-0">0</div>
-                            <div class="scale-label scale-label-1">1</div>
-                            <div class="scale-instruction">Hover over ends of scale</div>
+                          <div class="scale-track"></div>
+                          <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
                           </div>
-                          <!-- Chart will be inserted here -->
-                          <div class="chart-svg-container"></div>
-                    </div>
-                    <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
-                </div>
-                
-                <div class="metric-card">
-                    <h4>Polarity Score</h4>
-                    <div class="metric-value">${result.polarity_score}</div>
-                    <div id="overall-polarity-chart" class="chart-container">
-                        <!-- Scale container -->
-                        <div class="polarity-score-scale">
-                            <!-- The scale track - bidirectional gradient -->
-                            <div class="scale-track"></div>
-                            
-                            <!-- The indicator -->
-                            <div class="scale-indicator" style="left: ${(result.polarity_score + 1) * 50}%;">
-                              <div class="indicator-line"></div>
-                              <div class="indicator-dot"></div>
-                            </div>
-                            <div class="scale-label scale-label-0">0</div>
-                            <div class="scale-label scale-label-1">1</div>
-                            <div class="scale-instruction">Hover over ends of scale</div>
-                          </div>
-                          <!-- Chart will be inserted here -->
-                          <div class="chart-svg-container"></div>
-                    </div>
-                    <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
-                </div>
-                
-                <div class="metric-card">
-                    <h4>Subjectivity Score</h4>
-                    <div class="metric-value">${result.subjectivity_score}</div>
-                    <div id="overall-subjectivity-chart" class="chart-container">
-                        <!-- Scale container -->
-                        <div class="subjectivity-score-scale">
-                            <!-- The scale track - blue gradient -->
-                            <div class="scale-track"></div>
-                            
-                            <!-- The indicator -->
-                            <div class="scale-indicator" style="left: ${result.subjectivity_score * 100}%;">
-                              <div class="indicator-line"></div>
-                              <div class="indicator-dot"></div>
-                            </div>
-                            <div class="scale-label scale-label-0">0</div>
-                            <div class="scale-label scale-label-1">1</div>
-                            <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
-                                0
-                            </div>
-                            <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
-                                100
-                            </div>
-                            <div class="scale-instruction">Hover over ends of scale</div>
-                          </div>
-                          <!-- Chart will be inserted here -->
-                          <div class="chart-svg-container"></div>
-                    </div>
-                    <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.</span>
-                </div>
-                
-                <div class="metric-card">
-                    <h4>Quotes Count</h4>
-                    <div class="metric-value">${result.num_quotes}</div>
-                    <div id="num-speech-attributes-chart" class="chart-container">
-                        <div class="chart-svg-container"></div>
-                    </div>
-                    <span class="tooltip">An approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.</span>
-                </div>
-                <div class="metric-card">
-                    <h4>Word Count</h4>
-                    <div class="metric-value">${result.word_count}</div>
-                    <div id="word-count-chart" class="chart-container">
-                    
-                        <div class="chart-svg-container"></div>
-                    </div>
-                    <span class="tooltip">The length of an article.</span>
-                </div>
-                <div class="metric-card">
-                    <h4>Readability</h4>
-                    <div class="metric-value">${result.flesch_reading_ease}</div>
-                    <div id="flesch-reading-ease-chart" class="chart-container">
-                        <!-- Readability scale with difficulty zones -->
-                        <div class="readability-scale">
-                            <!-- Multi-color gradient for difficulty levels -->
-                            <div class="scale-track"></div>
-                            
-                            <!-- Indicator -->
-                            <div class="scale-indicator" style="left: ${result.flesch_reading_ease}%;">
-                                <div class="indicator-line"></div>
-                                <div class="indicator-dot"></div>
-                            </div>
-                            
-                            <!-- Zone markers -->
-                            <div class="zone-marker" style="left: 30%;" data-tooltip="College level"></div>
-                            <div class="zone-marker" style="left: 50%;" data-tooltip="High school"></div>
-                            <div class="zone-marker" style="left: 70%;" data-tooltip="8th grade"></div>
-                            <div class="zone-marker" style="left: 90%;" data-tooltip="5th grade"></div>
-                            
-                            <!-- Scale labels -->
-                            <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
-                                0
-                            </div>
-                            <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
-                                100
-                            </div>
-                            <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                          <div class="scale-label scale-label-0">-1</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
                         </div>
+                        <!-- Chart will be inserted here -->
                         <div class="chart-svg-container"></div>
-                    </div>
-                    <span class="tooltip">A measure of text readability based on text length and syllabic content. Difficult to Read = 1, Easy to Read = 100.</span>
-                </div>
-            `;
+                      </div>
+                  <span class="tooltip">The overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.</span>
+              </div>
+                                  
+              <div class="metric-card">
+                  <h4>Avg. Subjectivity</h4>
+                  <div class="metric-value">${result.avg_subjectivity}</div>
+                  <div id="avg-sentence-subjectivity-chart" class="chart-container">
+                      <!-- Scale container -->
+                      <div class="subjectivity-scale">
+                          <!-- The scale track - blue gradient for objectivity/subjectivity -->
+                          <div class="scale-track"></div>
+                          
+                          <!-- The indicator for the current value -->
+                          <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">0</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
+              </div>
+              
+              <div class="metric-card">
+                  <h4>Polarity Score</h4>
+                  <div class="metric-value">${result.polarity_score}</div>
+                  <div id="overall-polarity-chart" class="chart-container">
+                      <!-- Scale container -->
+                      <div class="polarity-score-scale">
+                          <!-- The scale track - bidirectional gradient -->
+                          <div class="scale-track"></div>
+                          
+                          <!-- The indicator -->
+                          <div class="scale-indicator" style="left: ${(result.polarity_score + 1) * 50}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">0</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
+              </div>
+              
+              <div class="metric-card">
+                  <h4>Subjectivity Score</h4>
+                  <div class="metric-value">${result.subjectivity_score}</div>
+                  <div id="overall-subjectivity-chart" class="chart-container">
+                      <!-- Scale container -->
+                      <div class="subjectivity-score-scale">
+                          <!-- The scale track - blue gradient -->
+                          <div class="scale-track"></div>
+                          
+                          <!-- The indicator -->
+                          <div class="scale-indicator" style="left: ${result.subjectivity_score * 100}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">0</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                              0
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
+                              100
+                          </div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.</span>
+              </div>
+              
+              <div class="metric-card">
+                  <h4>Quotes Count</h4>
+                  <div class="metric-value">${result.num_quotes}</div>
+                  <div id="num-speech-attributes-chart" class="chart-container">
+                      <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">An approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.</span>
+              </div>
+              <div class="metric-card">
+                  <h4>Word Count</h4>
+                  <div class="metric-value">${result.word_count}</div>
+                  <div id="word-count-chart" class="chart-container">
+                  
+                      <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">The length of an article.</span>
+              </div>
+              <div class="metric-card">
+                  <h4>Readability</h4>
+                  <div class="metric-value">${result.flesch_reading_ease}</div>
+                  <div id="flesch-reading-ease-chart" class="chart-container">
+                      <!-- Readability scale with difficulty zones -->
+                      <div class="readability-scale">
+                          <!-- Multi-color gradient for difficulty levels -->
+                          <div class="scale-track"></div>
+                          
+                          <!-- Indicator -->
+                          <div class="scale-indicator" style="left: ${result.flesch_reading_ease}%;">
+                              <div class="indicator-line"></div>
+                              <div class="indicator-dot"></div>
+                          </div>
+                          
+                          <!-- Zone markers -->
+                          <div class="zone-marker" style="left: 30%;" data-tooltip="College level"></div>
+                          <div class="zone-marker" style="left: 50%;" data-tooltip="High school"></div>
+                          <div class="zone-marker" style="left: 70%;" data-tooltip="8th grade"></div>
+                          <div class="zone-marker" style="left: 90%;" data-tooltip="5th grade"></div>
+                          
+                          <!-- Scale labels -->
+                          <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                              0
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
+                              100
+                          </div>
+                          <div class="scale-instruction">Hover over ends of scale to see examples</div>
+                      </div>
+                      <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">A measure of text readability based on text length and syllabic content. Difficult to Read = 1, Easy to Read = 100.</span>
+              </div>
+          `;
+
+          // Now call the update function to apply dynamic colors
+          updateVerdictBadge(result);
+
+          console.log('Attempting to create the kde plots');
+          // Create charts using the data
+          createFleschReadingEaseChart(chartData, result.flesch_reading_ease);
+          createWordCountChart(chartData, result.word_count);
+          createOverallPolarityChart(chartData, result.polarity_score);
+          createOverallSubjectivityChart(chartData, result.subjectivity_score);
+          createAvgSentencePolarityChart(chartData, result.avg_polarity);
+          createAvgSentenceSubjectivityChart(chartData, result.avg_subjectivity);
+          createNumSpeechAttributesChart(chartData, result.num_quotes);
       } catch (error) {
         document.getElementById("outputData").innerHTML = `
           <div class="error-card">
@@ -746,6 +839,31 @@
             <button onclick="fetchOutputData()">Retry</button>
           </div>
         `;
+      } finally {
+        // Only remove the spinner after everything is complete
+        const spinner = document.getElementById("globalSpinner");
+        if (spinner) spinner.remove();
+      }
+    }
+
+    function applyVerdictBadgeColor(badgeElement, score) {
+      badgeElement.classList.remove('high-credibility', 'medium-credibility', 'low-credibility');
+
+      if (score > 70) {
+        badgeElement.classList.add('high-credibility');
+      } else if (score > 40) {
+        badgeElement.classList.add('medium-credibility');
+      } else {
+        badgeElement.classList.add('low-credibility');
+      }
+    }
+
+    function updateVerdictBadge(result) {
+      // Assume result.fake_percent contains a numeric score, e.g. 82 for 82% credibility.
+      const credibilityScore = Number(result.fake_percent);
+      const badgeElement = document.getElementById('verdictBadge');
+      if (badgeElement) {
+        applyVerdictBadgeColor(badgeElement, credibilityScore);
       }
     }
 
