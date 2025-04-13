@@ -162,7 +162,58 @@ def setup_input_articles():
     Forget everything you thought you knew about galactic formation. Okay, done? Good. Because a new discovery has scientists questioning their previous understanding of how galaxies are formed. You can read more about the “Big Wheel” galaxy here. It’s news you probably can’t use, but I think we all deserve a bit of fun.
     """
 
-    d = {title1:text1,title2:text2,title3:text3,title4:text4,title5:text5,title6:text6,title7:text7,title8:text8,title9:text9,title10:text10}
+    title11 = "Declassified CIA Files Reveal Hitler Didn’t Die, He Lived Secretly in South America For Decades"
+    text11= """
+    Declassified CIA Files Reveal Hitler Didn’t Die, He Lived Secretly in South America For Decades
+    Fact checked by The People's Voice CommunityApril 11, 2025 Baxter Dmitry News, US 49 Comments
+    Declassified CIA secrets drop a jaw-dropping truth: for a full decade after Adolf Hitler’s so-called “death” in a Berlin bunker, the agency hunted him across South America, convinced he’d slipped into the shadows, declassified files reveal.
+    The documents, dating from 1945 to 1955 and recently declassified by the CIA, were analyzed by the Washington Post this week. They show that field agents suspected Hitler may have escaped to South America under an alias, even though the agency had received an autopsy report supposedly confirming his death.
+    According to MI5 files, Hitler and his longtime companion Eva Braun, whom he had married the day before, killed themselves on April 30, 1945, in his Berlin bunker to avoid capture. Their partially burned bodies were later discovered by Soviet soldiers outside the Reich Chancellery. Yet CIA agents had intelligence that confirmed this was a fabricated story; and they continued to chase leads into the mid-1950s.
+    One 1945 file said US War Department agents told the FBI that a spa hotel in La Falda, Argentina, had been prepared as a potential hideout. The hotel’s owners, who had donated to propaganda chief Joseph Goebbels, had close ties to Hitler. US intelligence believed they had made “all necessary” preparations to shelter Hitler after Germany’s defeat in WWII.
+    Another document from October 1955 included a photo of a man believed to be Hitler sitting with a friend in Colombia. The man, using the name Adolf Schrittelmayor, reportedly left Colombia for Argentina in January 1955.
+    The CIA briefly authorized an investigation into Schrittelmayor’s background but later dropped it, noting that “enormous efforts could be expended on this matter with remote possibilities of establishing anything concrete.” 
+    No further CIA documents made public suggest that agents continued searching for Hitler after 1955, the WaPo reported.
+    The revelations come as Argentina – long known as a hideout for Nazi fugitives – prepares to declassify government documents related to those who found sanctuary there after WWII.
+    As many as 10,000 war criminals are believed to have used so-called ‘ratlines’ to escape Europe. Roughly half reportedly settled in Argentina, which was known for its reluctance to grant extradition requests.
+    Among them were Adolf Eichmann, a key architect of the Holocaust, and Josef Mengele, the notorious Auschwitz doctor. Eichmann was captured by Israeli agents in 1960 and taken to Israel for trial. Mengele evaded capture and died in Brazil in 1979 after suffering a heart attack while swimming.
+    """
+
+    title12 = "Secret Service Denies RFK, Jr Protection Again After Armed Man Infiltrates His Security"
+    text12= """
+    WASHINGTON – The US Secret Service has again denied Democratic Presidential candidate,  Robert F. Kennedy, JR., its protection, as is customary for US Presidential candidates.
+    Kennedy has repeated his request for secret service protection after an armed gunman, disguised as a US Marshall, penetrated security at Kennedy’s event at the Wilshire Ebell Theatre in Los Angeles to celebrate Hispanic Heritage Month. The Kennedy campaign also stated that police “took custody” of a second man that allegedly came to the event.
+    The location was less than two miles from where Kennedy’s father, Robert F. Kennedy, was shot and killed, shortly after winning the 1968 California Democratic Presidential Primary.
+    “Look, no one has ever shot a Kennedy and gotten away with it,” stated assistant Secret Service Spokesperson, Adam Sandler (no relation). “Lee Harvey Oswald….Sirhan Sirhan….That other guy. They all totally got caught.”
+    The Secret Service’s official explanation for denying Kennedy protection was that the November 2024 election is still too far away.
+    “And with all due respect, Mr. Kennedy doesn’t have a chance in hell of winning anyway, so it would be a waste of our precious bodily fluids to protect him at this time. We will give him protection next year, 90 days before the general election. If he’s still alive,” said Sandler.
+    Kennedy claims he is the “first presidential candidate in history” to be denied protection after requesting it.
+    The Secret Service’s denial of protection to Robert Kennedy, Jr. was followed by a rash of purported leaks on social media, allegedly from texts Secret Service staff exchanged privately amongst themselves in reaction to Kennedy’s request.
+    Leaked texts from Secret Service agents on various alternative X (formerly Twitter) and TikTok accounts included:
+    “Maybe we could put our new agent, Sirhan Sirhan III, to guard RFK, Jr.”
+    “Kennedy is not a viable candidate. Only credible candidates such as President Biden and Vice President Harris should be given secret service protection.
+    “We are too busy guarding Biden and all of his body doubles. LOL.”
+    “No one has ever killed a Kennedy JR in a plane crash either, not even George W. Bush.”
+    “I don’t know why RFK, Jr. keeps asking for Secret Service protection. It’s not like the Secret Service was any good at protecting JFK or RFK anyway.”
+    """
+
+    title13 = "NASA Rescues Children Stranded For 9 Months At Space Camp"
+    text13= """
+    HUNTSVILLE, AL—Confirming that the group’s long ordeal was finally over, NASA announced Thursday that it had successfully rescued three children stranded for more than nine months at Space Camp. “At 12:07 p.m. Eastern Daylight Time today, 11-year-olds Lillian and Evan Peltier were safely returned to their home in Chattanooga, TN after an extended 286-day educational experience at Space Camp,” said NASA spokesperson Heather Frugé, adding that the twins’ planned week-long summer camp program had been significantly lengthened after the malfunction of the family Toyota Sienna that was intended to take them home. “By staying focused on their model rocketry experiments and carefully rationing Tang and chicken nuggets from the cafeteria, Lillian and Evan were able to endure the demanding conditions of Space Camp while NASA scientists worked around the clock to bring them back home. The siblings are in good health, though their extended stay at Space Camp has left them both 2 inches taller. We’re proud of the team-building and problem-solving skills they developed during their visit, and we’re grateful to SpaceX for providing the bus that ultimately allowed them to make their return.” When reached for comment, the Peltier children denied having ever felt “stuck” or “abandoned” at Space Camp and instead begged for another turn on the Multi-Axis Trainer.
+    """
+
+    title14 = "McDonald’s Just Recalled 1 Million Chicken Nuggets, The Reason Why Will Sicken You!"
+    text14= """
+    McDonald’s Just Recalled 1 Million Chicken Nuggets, The Reason Why Will Sicken You!
+    There has been a recall on 1 million Chicken McNuggets, and McDonald’s customers are NOT lovin’ it.
+    McDonald’s apologized to a customer after they found bits of blue plastic and an order of their chicken McNuggets. As a result, McDonald’s has pulled 1 million McNuggets from the factory. Another customer found a piece of vinyl in their McNuggets.
+    “We deeply apologize for the trouble we have caused our customers and we are taking quick measures to analyze the cause of this contamination,” said company spokeswoman Takashi Hasegasa.
+    This isn’t even the worst thing found in McDonald’s food. Just last August, a customer complained after finding a piece of human tooth in their french fries order. Gross!
+    McDonald’s has been having some poultry issues though. Last July, McDonald’s had to shut down its poultry supplier after the company began mixing fresh chicken with expired chicken meat, making it a potentially deadly health hazard for consumers.
+    Stories like these have led to a 10% drop in McDonald’s sales just in the last year, according to CNN. McDonald’s is trying to smooth it over with discounts and giveaways. But are consumers really buying that? What is your health worth? If it happened before, it can happen again!
+    Will you still eat these chicken nuggets or feed them to your kids? Share with your family and friends so they can make an informed decision! Your life could depend on it!
+    """
+
+    d = {title1:text1,title2:text2,title3:text3,title4:text4,title5:text5,title6:text6,title7:text7,title8:text8,title9:text9,title10:text10,title11:text11,title12:text12,title13:text13,title14:text14}
     with open("article_text.pkl", "wb") as file:
         pickle.dump(d, file)
         
