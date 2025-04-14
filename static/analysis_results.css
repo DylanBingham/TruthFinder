@@ -1,0 +1,81 @@
+.analysis-results-card {
+    background-color: #ffffff;      /* Card-like white background */
+    border: 1px solid #e0e0e0;      /* Light gray border */
+    border-radius: 8px;             /* Slight rounding of corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+    padding: 20px;                  /* Space inside the card */
+    margin-bottom: 20px;            /* Space below, before next section */
+  }
+  
+
+
+
+  /* The below is not being used currently, keeping for possible 
+  future use */
+  .analysis-results-card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .score-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;               /* If space is tight, text wraps nicely */
+    margin-bottom: 8px;
+  }
+  
+  .score-label {
+    font-weight: 600;
+    margin-right: 8px;
+    color: #555;
+  }
+  
+  .score-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-right: 12px;
+    color: #333;
+  }
+
+  .section-divider {
+    border: 0;
+    border-top: 3px solid #ddd;
+    margin: 20px 0;
+  }
+  
+  .confidence-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: auto;  /* push it to the right if desired */
+  }
+  
+  /* Example: highlight "high" confidence in green, etc. */
+  .confidence-badge.high {
+    background-color: #c8e6c9;
+    color: #388e3c;
+  }
+  
+  .confidence-badge.moderate {
+    background-color: #fff9c4;
+    color: #fbc02d;
+  }
+  
+  .confidence-badge.low {
+    background-color: #ffcdd2;
+    color: #d32f2f;
+  }
+  
+  .confidence-text {
+    margin: 10px 0;
+    color: #555;
+  }
+  
+  .scale-bar {
+    margin-top: 15px;
+    /* style your horizontal bar or gradient here */
+  }
+  

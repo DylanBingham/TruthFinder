@@ -1,0 +1,12 @@
+pandas
+numpy
+scikit-learn
+seaborn
+nltk
+ipykernel
+jupyter
+textstat
+textblob
+wordcloud
+flask
+flask-cors

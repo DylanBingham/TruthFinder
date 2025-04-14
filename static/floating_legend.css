@@ -1,0 +1,59 @@
+/* Floating Legend Container */
+.floating-legend {
+    position: fixed; 
+    top: 220px;           /* Adjust so it's under your Info button */
+    left: 10px;          /* Spacing from left edge */
+    width: 160px;        /* Adjust width as needed */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 10px;
+    z-index: 1000;       /* Ensure it’s above chart elements */
+    font-family: sans-serif;
+  }
+  
+  /* Legend title */
+  .floating-legend h4 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    text-align: center;
+    color: #333;
+  }
+  
+  /* Legend items */
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 2px;
+  }
+  
+  .green-line {
+    background-color: #4daf4a;  /* Same green as your chart line */
+  }
+  
+  .red-line {
+    background-color: #e15759;  /* Same red as your chart line */
+  }
+  
+  /* Dashed line example */
+  .dashed-line {
+    width: 0;
+    height: 15px;
+    border-left: 2px dashed #ff5733;
+    margin-right: 8px;
+    }
+  
+  .legend-label {
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
