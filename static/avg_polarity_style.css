@@ -1,0 +1,492 @@
+/* polarity-scale.css */
+.polarity-scale {
+  position: relative; /* Keeps it in document flow */
+  z-index: 2; /* Renders above the chart */
+  margin-bottom: 20px; /* Space between scale and chart */
+  background: rgba(255,255,255,0.8); /* Optional: makes scale more readable */
+  padding: 10px;
+  border-radius: 8px;
+}
+.scale-track {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #ff0000, #ffff00, #00ff00);
+    border-radius: 2px;
+}
+
+.scale-indicator {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.indicator-line {
+    height: 20px;
+    width: 2px;
+    background: #333;
+    margin: 0 auto;
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    background: #333;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.scale-label {
+    position: absolute;
+    top: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    z-index:1000;
+    transition: background 0.2s;
+}
+
+.scale-label:hover {
+    background: #f0f0f0;
+}
+
+.scale-label-0 {
+    left: 0;
+}
+
+.scale-label-1 {
+    right: 0;
+}
+
+/* Tooltip styling */
+.scale-label::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    z-index: 9999;
+}
+
+.scale-label:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* subjectivity-scale.css */
+.subjectivity-scale {
+    position: relative;
+    height: 40px;
+    margin: 20px 0;
+}
+
+.subjectivity-scale .scale-track {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #e6f7ff, #1890ff);
+    border-radius: 2px;
+}
+
+.subjectivity-scale .scale-indicator {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.subjectivity-scale .indicator-line {
+    height: 20px;
+    width: 2px;
+    background: #333;
+    margin: 0 auto;
+}
+
+.subjectivity-scale .indicator-dot {
+    width: 10px;
+    height: 10px;
+    background: #1890ff; /* Blue to match scale */
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.subjectivity-scale .scale-label {
+    position: absolute;
+    top: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.subjectivity-scale .scale-label:hover {
+    background: #f0f0f0;
+}
+
+.subjectivity-scale .scale-label-0 {
+    left: 0;
+}
+
+.subjectivity-scale .scale-label-1 {
+    right: 0;
+}
+
+/* Tooltip styling (same as polarity) */
+.subjectivity-scale .scale-label::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    z-index: 9999;
+}
+
+.subjectivity-scale .scale-label:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* polarity-score-scale.css */
+.polarity-score-scale {
+    position: relative;
+    height: 40px;
+    margin: 20px 0;
+}
+
+.polarity-score-scale .scale-track {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, 
+        #ff0000 0%, #ff0000 50%, 
+        #ffff00 50%, #ffff00 55%,
+        #00ff00 55%, #00ff00 100%);
+    border-radius: 2px;
+}
+
+.polarity-score-scale .scale-indicator {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.polarity-score-scale .indicator-line {
+    height: 20px;
+    width: 2px;
+    background: #333;
+    margin: 0 auto;
+}
+
+.polarity-score-scale .indicator-dot {
+    width: 10px;
+    height: 10px;
+    background: #333;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+/* Label positioning */
+.polarity-score-scale .scale-label {
+    position: absolute;
+    top: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.polarity-score-scale .scale-label-neg {
+    left: 0;
+}
+
+.polarity-score-scale .scale-label-neutral {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.polarity-score-scale .scale-label-pos {
+    right: 0;
+}
+
+/* Tooltip styling */
+.polarity-score-scale .scale-label::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    z-index: 9999;
+}
+
+.polarity-score-scale .scale-label:hover {
+    background: #f0f0f0;
+}
+
+.polarity-score-scale .scale-label:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* subjectivity-score-scale.css */
+.subjectivity-score-scale {
+    position: relative;
+    height: 40px;
+    margin: 20px 0;
+}
+
+.subjectivity-score-scale .scale-track {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #e6f7ff, #1890ff);
+    border-radius: 2px;
+}
+
+.subjectivity-score-scale .scale-indicator {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.subjectivity-score-scale .indicator-line {
+    height: 20px;
+    width: 2px;
+    background: #333;
+    margin: 0 auto;
+}
+
+.subjectivity-score-scale .indicator-dot {
+    width: 10px;
+    height: 10px;
+    background: #1890ff; /* Blue to match scale */
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+/* Label positioning */
+.subjectivity-score-scale .scale-label {
+    position: absolute;
+    top: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.subjectivity-score-scale .scale-label-min {
+    left: 0;
+    z-index: 10000;
+}
+
+.subjectivity-score-scale .scale-label-mid {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.subjectivity-score-scale .scale-label-max {
+    right: 0;
+    z-index: 10000;
+}
+
+/* Tooltip styling */
+.subjectivity-score-scale .scale-label::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    z-index: 9999;
+}
+
+.subjectivity-score-scale .scale-label:hover {
+    background: #f0f0f0;
+}
+
+.subjectivity-score-scale .scale-label:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* readability-scale.css */
+.readability-scale {
+    position: relative;
+    height: 50px; /* Slightly taller to accommodate zones */
+    margin: 15px 0;
+}
+
+.readability-scale .scale-track {
+    position: absolute;
+    top: 25px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(to right, 
+        #ff4d4f 0%, #ff4d4f 30%, 
+        #faad14 30%, #faad14 50%, 
+        #a0d911 50%, #a0d911 70%, 
+        #52c41a 70%, #52c41a 90%,
+        #389e0d 90%, #389e0d 100%);
+    border-radius: 3px;
+}
+
+.readability-scale .scale-indicator {
+    position: absolute;
+    top: 5px;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.readability-scale .indicator-line {
+    height: 20px;
+    width: 2px;
+    background: #333;
+    margin: 0 auto;
+}
+
+.readability-scale .indicator-dot {
+    width: 12px;
+    height: 12px;
+    background: #096dd9;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 0 auto;
+}
+
+/* Zone markers */
+.readability-scale .zone-marker {
+    position: absolute;
+    top: 20px;
+    width: 1px;
+    height: 10px;
+    background: rgba(0,0,0,0.2);
+    transform: translateX(-50%);
+}
+
+/* Labels */
+.readability-scale .scale-label {
+    position: absolute;
+    top: 35px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.readability-scale .scale-label-min {
+    left: 0;
+    z-index: 10000;
+}
+
+.readability-scale .scale-label-max {
+    right: 0;
+    z-index: 10000;
+     
+}
+
+/* Tooltips */
+.readability-scale .scale-label::after,
+.readability-scale .zone-marker::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s;
+    z-index: 10;
+}
+
+.readability-scale .scale-label:hover::after,
+.readability-scale .zone-marker:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.readability-scale .scale-label:hover {
+    background: #f0f0f0;
+}
+
+.scale-instruction {
+    text-align: center;
+    font-size: 11px;
+    color: #666;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+#avg-sentence-polarity-chart svg {
+  position: relative;
+  z-index: 1;
+  margin-top: -40px; /* Pulls chart up to meet scale */
+}
