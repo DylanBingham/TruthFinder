@@ -237,7 +237,7 @@ function createWordCountChart(data, verticalLinePosition) {
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10)
         .style("text-anchor", "middle")
-        .text("Number of Words");
+        .text("Number of Words (Log-Scaled)");
     
     // Add y axis label
     svg.append("text")

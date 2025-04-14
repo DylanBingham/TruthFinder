@@ -70,7 +70,7 @@
 
     #outputSection {
       max-width: 100%;
-      overflow-x: hidden;
+      overflow-x: visible; /* Allow overflow for scale tooltips */
       box-sizing: border-box;
       padding: 0 15px;
     }
@@ -214,7 +214,7 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
-      overflow: hidden
+      overflow: visible; /* Allow tooltips to overflow */
     }
     .metric-card:hover {
       transform: translateY(-5px);
@@ -239,9 +239,9 @@
       text-align: center;
       border-radius: 6px;
       padding: 8px;
-      position: absolute;
-      z-index: 1;
-      bottom: 120%;
+      position: fixed;
+      z-index: 9999;
+      bottom: 80%;
       left: 50%;
       transform: translateX(-50%);
       opacity: 0;
@@ -308,7 +308,7 @@
       padding: 20px;
       background-color: var(--card-bg);
       position: relative;
-      overflow: hidden;
+      overflow: visible; /* Allow tooltips to overflow */
       display: flex;
       flex-direction: column;
     }
@@ -693,6 +693,12 @@
                           </div>
                           <div class="scale-label scale-label-0">-1</div>
                           <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="Completely Negative">
+                              -1
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="Completely Positive">
+                              1
+                          </div>
                           <div class="scale-instruction">Hover over ends of scale</div>
                         </div>
                         <!-- Chart will be inserted here -->
@@ -717,6 +723,12 @@
                           </div>
                           <div class="scale-label scale-label-0">0</div>
                           <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="More Factual Content">
+                              0
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="More Opinionated Content">
+                              1
+                          </div>
                           <div class="scale-instruction">Hover over ends of scale</div>
                         </div>
                         <!-- Chart will be inserted here -->
@@ -739,14 +751,20 @@
                             <div class="indicator-line"></div>
                             <div class="indicator-dot"></div>
                           </div>
-                          <div class="scale-label scale-label-0">0</div>
+                          <div class="scale-label scale-label-0">-1</div>
                           <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="Completely Negative">
+                              -1
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="Completely Positive">
+                              1
+                          </div>
                           <div class="scale-instruction">Hover over ends of scale</div>
                         </div>
                         <!-- Chart will be inserted here -->
                         <div class="chart-svg-container"></div>
                   </div>
-                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
+                  <span class="tooltip">The overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.</span>
               </div>
               
               <div class="metric-card">
@@ -765,11 +783,11 @@
                           </div>
                           <div class="scale-label scale-label-0">0</div>
                           <div class="scale-label scale-label-1">1</div>
-                          <div class="scale-label scale-label-min" data-tooltip="Very difficult (Professional)">
+                          <div class="scale-label scale-label-min" data-tooltip="More Factual Content">
                               0
                           </div>
-                          <div class="scale-label scale-label-max" data-tooltip="Very easy (Elementary school)">
-                              100
+                          <div class="scale-label scale-label-max" data-tooltip="More Opinionated Content">
+                              1
                           </div>
                           <div class="scale-instruction">Hover over ends of scale</div>
                         </div>

@@ -229,7 +229,7 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10)
         .style("text-anchor", "middle")
-        .text("Subjectivity Score (0 to 1)");
+        .text("Subjectivity Score (0 to 1) (Log-Scaled)");
     
     // Add y axis label
     svg.append("text")

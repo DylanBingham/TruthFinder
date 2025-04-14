@@ -224,7 +224,7 @@ function createNumSpeechAttributesChart(data, verticalLinePosition) {
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10)
         .style("text-anchor", "middle")
-        .text("Count of Speech Attributes");
+        .text("Count of Speech Attributes (Log-Scaled)");
     
     // Add y axis label
     svg.append("text")
