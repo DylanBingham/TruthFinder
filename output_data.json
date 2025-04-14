@@ -1,15 +1,15 @@
 [
     {
-        "fake_percent": 99.8,
-        "fake_percent_display": "moderate confidence",
-        "confidence": 0.58,
-        "last_updated": "2025-04-11T07:53:20.132324",
-        "polarity_score": 0.01,
-        "subjectivity_score": 0.2,
-        "avg_polarity": 0.0,
-        "avg_subjectivity": 0.1,
-        "num_quotes": 8,
-        "word_count": 260,
-        "flesch_reading_ease": 45.0
+        "fake_percent": 15.249999999999996,
+        "fake_percent_display": "very low credibility",
+        "confidence": 0.15,
+        "last_updated": "2025-04-13T19:57:55.145198",
+        "polarity_score": 0.23,
+        "subjectivity_score": 0.62,
+        "avg_polarity": 0.26,
+        "avg_subjectivity": 0.59,
+        "num_quotes": 1,
+        "word_count": 227,
+        "flesch_reading_ease": 41.0
     }
 ]

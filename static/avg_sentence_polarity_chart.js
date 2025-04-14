@@ -8,9 +8,9 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
 
     // Config with proper dimensions accounting for margins
     const config = {
-        width: containerWidth - 40, // Account for padding
+        width: containerWidth - 60, // Account for padding
         height: containerHeight - 40,
-        margin: { top: 30, right: 20, bottom: 40, left: 40 }, // Reduced margins
+        margin: { top: 30, right: 20, bottom: 40, left: 50 }, // Reduced margins
         numBins: 30, // Reduced number of bins for smaller containers
         kdePoints: 500,
         verticalLine: {
@@ -24,12 +24,24 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
     const filteredData = data.map(d => +d.avg_sentence_polarity).filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
 
+    // Also, split the data into two groups based on the binary_label
+    const dataLabel0 = data
+        .filter(d => +d.binary_label === 0)
+        .map(d => +d.avg_sentence_subjectivity)
+        .filter(d => !isNaN(d));
+    const dataLabel1 = data
+        .filter(d => +d.binary_label === 1)
+        .map(d => +d.avg_sentence_subjectivity)
+        .filter(d => !isNaN(d));
+
+
     // Create SVG with dimensions that account for margins
     const svg = container.append("svg")
         .attr("width", config.width + config.margin.left + config.margin.right)
         .attr("height", config.height + config.margin.top + config.margin.bottom)
         .append("g")
         .attr("transform", `translate(${config.margin.left},${config.margin.top})`);
+
         
     // Create defs if they don't exist
     if (svg.select("defs").empty()) {
@@ -66,35 +78,54 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
     
     const bins = histogram(filteredData);
     
-    // Set up y scale for histogram
+    // Calculate maximum relative frequency from the histogram
+    const maxHistogram = d3.max(bins, d => d.length / filteredData.length);
+
+    // Create KDE line with explicit styling
+    const kdeEstimator = kernelDensityEstimator(kernelEpanechnikov(0.5), x.ticks(config.kdePoints));
+    // Compute KDE data for the two subsets
+    const kdeData0 = kdeEstimator(dataLabel0);
+    const kdeData1 = kdeEstimator(dataLabel1);
+
+    // Calculate maximum KDE values for each subset
+    const maxKDE0 = d3.max(kdeData0, d => d[1]);
+    const maxKDE1 = d3.max(kdeData1, d => d[1]);
+    
+    // Unify the y-scale: use the larger of the histogram max and KDE max
+    const yDomainMax = Math.max(maxHistogram, maxKDE0, maxKDE1);
     const y = d3.scaleLinear()
-        .domain([0, d3.max(bins, d => d.length / filteredData.length)])
+        .domain([0, yDomainMax])
         .range([config.height, 0]);
     
-    // Create bars with explicit styling
-    svg.selectAll("rect")
-        .data(bins)
-        .enter().append("rect")
-        .attr("x", d => x(d.x0) + 1)
-        .attr("y", d => y(d.length / filteredData.length))
-        .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-        .attr("height", d => config.height - y(d.length / filteredData.length))
-        .attr("fill", "steelblue")
-        .attr("opacity", 0.7);
-    
-    // Create KDE line with explicit styling
-    const kde = kernelDensityEstimator(kernelEpanechnikov(0.5), x.ticks(config.kdePoints));
-    const kdeData = kde(filteredData);
+    // // Create bars with explicit styling
+    // svg.selectAll("rect")
+    //     .data(bins)
+    //     .enter().append("rect")
+    //     .attr("x", d => x(d.x0) + 1)
+    //     .attr("y", d => y(d.length / filteredData.length))
+    //     .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+    //     .attr("height", d => config.height - y(d.length / filteredData.length))
+    //     .attr("fill", "steelblue")
+    //     .attr("opacity", 0.7);
     
     const line = d3.line()
         .x(d => x(d[0]))
         .y(d => y(d[1]));
     
+    // Plot KDE curve for binary_label === 0    
     svg.append("path")
-        .datum(kdeData)
+        .datum(kdeData0)
         .attr("d", line)
         .attr("fill", "none")
-        .attr("stroke", "darkorange")
+        .attr("stroke", "#e15759") // Distinct red color
+        .attr("stroke-width", 2);
+
+    // Plot KDE curve for binary_label === 1
+    svg.append("path")
+        .datum(kdeData1)
+        .attr("d", line)
+        .attr("fill", "none")
+        .attr("stroke", "#4daf4a") // Green (or your chosen color)
         .attr("stroke-width", 2);
     
     // Add vertical line at specified position
@@ -150,19 +181,28 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
     
     // Simplified labels - adjusted to account for margins
     svg.append("text")
+        .attr("class", "axis-label")
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10) // Adjusted for bottom margin
         .style("text-anchor", "middle")
-        .style("font-size", "10px")
         .text("Polarity Score (-1 to 1)");
     
     svg.append("text")
+        .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
         .attr("x", -config.height / 2)
         .attr("y", -config.margin.left + 15) // Adjusted for left margin
         .style("text-anchor", "middle")
-        .style("font-size", "10px")
         .text("Density");
+
+    // Add title
+    svg.append("text")
+        .attr("class", "chart-title")
+        .attr("x", config.width / 2)
+        .attr("y", -config.margin.top / 2)
+        .style("text-anchor", "middle")
+        .text("Distribution of Avg. Polarity");
+
 }
 
 // Kernel Density Estimation functions (unchanged)
