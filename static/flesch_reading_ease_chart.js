@@ -94,7 +94,7 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
     const maxKDE1 = d3.max(kdeData1, d => d[1]);
     
     // Unify the y-scale: use the larger of the histogram max and KDE max
-    const yDomainMax = Math.max(maxHistogram, maxKDE0, maxKDE1);
+    const yDomainMax = Math.max(maxKDE0, maxKDE1);
     const y = d3.scaleLinear()
         .domain([0, yDomainMax])
         .range([config.height, 0]);
