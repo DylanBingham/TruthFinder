@@ -166,15 +166,35 @@ def extract_features_from_article(article_text):
     feature_vector = [features[col] for col in feature_order]
     feature_vector = np.array(feature_vector).reshape(1, -1)
     
-    #Notes from Kevin: Vedant The next step I need you to do is transform the data from prediction to 
-    # the front end. Use examples of how I get the features to appear on the front end
-    # and take the same approach. Right now the global_resp_data variable in app.py has static numbers for outputs
+    # Convert the TF-IDF vector to a dense array and get the vocabulary.
+    tfidf_array = tfidf_vec.toarray()[0]
+    vocab = tfidf_vectorizer.get_feature_names_out()
+    
+    # Zip the vocabulary and corresponding tfidf scores; filter out zero values.
+    term_scores = [(term, score) for term, score in zip(vocab, tfidf_array) if score > 0]
+    
+    # Sort terms by descending tfidf value and take the top 10 (you can adjust this number).
+    top_terms = sorted(term_scores, key=lambda x: x[1], reverse=True)[:10]
+    
+    # IMPORTANT: You must have computed these dictionaries beforehand.
+    # For demonstration, we assume they are available as:
+    # credible_tfidf_avg and noncredible_tfidf_avg, mapping each term to its average tfidf.
+    tfidf_dumbbell_data = []
+    for term, score in top_terms:
+        avgCredible = credible_tfidf_avg.get(term, 0.0)
+        avgNonCredible = noncredible_tfidf_avg.get(term, 0.0)
+        tfidf_dumbbell_data.append({
+            "term": term,
+            "score": float(score),
+            "avgCredible": float(avgCredible),
+            "avgNonCredible": float(avgNonCredible)
+        })
     
     
     # 6. Use the RF model to generate a prediction
     prediction = rf_model.predict_proba(feature_vector)
     
-    return features, prediction[0,1]
+    return features, prediction[0,1], tfidf_dumbbell_data
 
 # Example usage, uncomment and pass one of the articles to test the function:
 # article = "This is an example article. It includes numbers like 123, punctuation, and multiple sentences."
