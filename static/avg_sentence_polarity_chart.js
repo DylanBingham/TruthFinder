@@ -21,17 +21,19 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
             hoverColor: "#FF0000"
         }
     };
-    const filteredData = data.map(d => +d.avg_sentence_polarity).filter(d => !isNaN(d));
+    const filteredData = data
+        .map(d => +d.avg_sentence_polarity)
+        .filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
 
     // Also, split the data into two groups based on the binary_label
     const dataLabel0 = data
         .filter(d => +d.binary_label === 0)
-        .map(d => +d.avg_sentence_subjectivity)
+        .map(d => +d.avg_sentence_polarity)
         .filter(d => !isNaN(d));
     const dataLabel1 = data
         .filter(d => +d.binary_label === 1)
-        .map(d => +d.avg_sentence_subjectivity)
+        .map(d => +d.avg_sentence_polarity)
         .filter(d => !isNaN(d));
 
 
@@ -174,7 +176,7 @@ function createAvgSentencePolarityChart(data, verticalLinePosition = 0) {
     // Simplified axes with fixed domain ticks
     svg.append("g")
         .attr("transform", `translate(0,${config.height})`)
-        .call(d3.axisBottom(x).ticks(5).tickValues([-1, -0.5, 0, 0.5, 1]));
+        .call(d3.axisBottom(x));
     
     svg.append("g")
         .call(d3.axisLeft(y).ticks(5));

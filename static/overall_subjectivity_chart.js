@@ -28,16 +28,19 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
         .map(d => +d.overall_subjectivity)
         .filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
+    console.log('The minimum in ovr_subj is ', Math.min(...filteredData))
 
     // Also, split the data into two groups based on the binary_label
     const dataLabel0 = data
         .filter(d => +d.binary_label === 0)
         .map(d => +d.overall_subjectivity)
         .filter(d => !isNaN(d));
+    console.log('The minimum in ovr_subj with label = 0 is ', Math.min(...dataLabel0))
     const dataLabel1 = data
         .filter(d => +d.binary_label === 1)
         .map(d => +d.overall_subjectivity)
         .filter(d => !isNaN(d));
+    console.log('The minimum in ovr_subj with label = 1 is ', Math.min(...dataLabel1))
 
     
     // Create SVG
@@ -69,8 +72,8 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
             .attr("height", config.height);
     }    
     // Set up scales
-    const x = d3.scaleLog()
-        .domain([d3.min(filteredData), 1])
+    const x = d3.scaleLinear()
+        .domain([0, 1])
         .range([0, config.width]);
     
     // Create histogram generator
@@ -229,7 +232,7 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10)
         .style("text-anchor", "middle")
-        .text("Subjectivity Score (0 to 1) (Log-Scaled)");
+        .text("Subjectivity Score (0 to 1)");
     
     // Add y axis label
     svg.append("text")

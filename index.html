@@ -711,62 +711,6 @@
         });
          
         document.getElementById("metricsDisplay").innerHTML = `
-              <div class="metric-card">
-                  <h4>Avg. Polarity</h4>
-                  <div class="metric-value">${result.avg_polarity}</div>
-                      <div id="avg-sentence-polarity-chart" class="chart-container">
-                        <!-- Scale container (won't be cleared by D3) -->
-                        <div class="subjectivity-scale">
-                          <div class="scale-track"></div>
-                          <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
-                            <div class="indicator-line"></div>
-                            <div class="indicator-dot"></div>
-                          </div>
-                          <div class="scale-label scale-label-0">-1</div>
-                          <div class="scale-label scale-label-1">1</div>
-                          <div class="scale-label scale-label-min" data-tooltip="Completely Negative">
-                              -1
-                          </div>
-                          <div class="scale-label scale-label-max" data-tooltip="Completely Positive">
-                              1
-                          </div>
-                          <div class="scale-instruction">Hover over ends of scale</div>
-                        </div>
-                        <!-- Chart will be inserted here -->
-                        <div class="chart-svg-container"></div>
-                      </div>
-                  <span class="tooltip">The overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.</span>
-              </div>
-                                  
-              <div class="metric-card">
-                  <h4>Avg. Subjectivity</h4>
-                  <div class="metric-value">${result.avg_subjectivity}</div>
-                  <div id="avg-sentence-subjectivity-chart" class="chart-container">
-                      <!-- Scale container -->
-                      <div class="subjectivity-scale">
-                          <!-- The scale track - blue gradient for objectivity/subjectivity -->
-                          <div class="scale-track"></div>
-                          
-                          <!-- The indicator for the current value -->
-                          <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
-                            <div class="indicator-line"></div>
-                            <div class="indicator-dot"></div>
-                          </div>
-                          <div class="scale-label scale-label-0">0</div>
-                          <div class="scale-label scale-label-1">1</div>
-                          <div class="scale-label scale-label-min" data-tooltip="More Factual Content">
-                              0
-                          </div>
-                          <div class="scale-label scale-label-max" data-tooltip="More Opinionated Content">
-                              1
-                          </div>
-                          <div class="scale-instruction">Hover over ends of scale</div>
-                        </div>
-                        <!-- Chart will be inserted here -->
-                        <div class="chart-svg-container"></div>
-                  </div>
-                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
-              </div>
               
               <div class="metric-card">
                   <h4>Polarity Score</h4>
@@ -825,9 +769,66 @@
                         <!-- Chart will be inserted here -->
                         <div class="chart-svg-container"></div>
                   </div>
-                  <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.</span>
+                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
               </div>
-              
+
+              <div class="metric-card">
+                  <h4>Avg. Polarity</h4>
+                  <div class="metric-value">${result.avg_polarity}</div>
+                      <div id="avg-sentence-polarity-chart" class="chart-container">
+                        <!-- Scale container (won't be cleared by D3) -->
+                        <div class="subjectivity-scale">
+                          <div class="scale-track"></div>
+                          <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">-1</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="Completely Negative">
+                              -1
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="Completely Positive">
+                              1
+                          </div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                      </div>
+                  <span class="tooltip">The average polarity (sentiment) of an article's sentences. A more fine-grained measure of polarity. Completely Negative = -1, Completely Positive = 1.</span>
+              </div>
+                                  
+              <div class="metric-card">
+                  <h4>Avg. Subjectivity</h4>
+                  <div class="metric-value">${result.avg_subjectivity}</div>
+                  <div id="avg-sentence-subjectivity-chart" class="chart-container">
+                      <!-- Scale container -->
+                      <div class="subjectivity-scale">
+                          <!-- The scale track - blue gradient for objectivity/subjectivity -->
+                          <div class="scale-track"></div>
+                          
+                          <!-- The indicator for the current value -->
+                          <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">0</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="More Factual Content">
+                              0
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="More Opinionated Content">
+                              1
+                          </div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity. More Factual Content = 0, More Opinionated Content = 1</span>
+              </div>
+
               <div class="metric-card">
                   <h4>Quotes Count</h4>
                   <div class="metric-value">${result.num_quotes}</div>
@@ -836,6 +837,7 @@
                   </div>
                   <span class="tooltip">An approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.</span>
               </div>
+              
               <div class="metric-card">
                   <h4>Word Count</h4>
                   <div class="metric-value">${result.word_count}</div>
@@ -845,6 +847,7 @@
                   </div>
                   <span class="tooltip">The length of an article.</span>
               </div>
+
               <div class="metric-card">
                   <h4>Readability</h4>
                   <div class="metric-value">${result.flesch_reading_ease}</div>

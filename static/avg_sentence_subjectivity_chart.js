@@ -177,7 +177,7 @@ function createAvgSentenceSubjectivityChart(data, verticalLinePosition) {
     // Simplified axes with meaningful ticks for subjectivity
     svg.append("g")
         .attr("transform", `translate(0,${config.height})`)
-        .call(d3.axisBottom(x).ticks(5).tickValues([0, 0.25, 0.5, 0.75, 1]));
+        .call(d3.axisBottom(x));
     
     svg.append("g")
         .call(d3.axisLeft(y).ticks(5));
