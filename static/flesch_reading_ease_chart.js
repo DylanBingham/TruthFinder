@@ -15,10 +15,10 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
         kdePoints: 500,
         verticalLine: {
             position: verticalLinePosition,
-            color: "#FF5733",
+            color: "#000000",
             strokeWidth: 2,
             strokeDasharray: "5,5",
-            hoverColor: "#FF0000"
+            hoverColor: "#000000"
         }
     };
 

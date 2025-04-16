@@ -2,4 +2,4 @@ venv
 data/
 __pycache__/
 best_rf_model.pkl
-static/final_dataset_with_pca_d3.csv
+static/final_dataset_with_pca_d3.csv"final_dataset_with_pca.csv" 

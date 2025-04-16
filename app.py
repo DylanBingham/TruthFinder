@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, g
 from flask_cors import CORS
 import os
 import json
@@ -14,17 +14,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 app = Flask(__name__)
 CORS(app)
 
-from utils import (
-    extract_features_from_article
-)
-
-import datetime
-import json
-import os
-
-
-app = Flask(__name__)
-CORS(app)
+# Module-level variable to store the response data
+shared_response_data = None
 
 # Sample dictionary of articles. You can map either titles or URLs to article text.
 articles = {
@@ -74,6 +65,8 @@ global_resp_data = {}
 # Your existing API routes
 @app.route('/save_url', methods=['POST'])
 def save_url():
+    global shared_response_data  # Access the module-level variable
+    
     logging.debug("Received request to save URL.")
     try:
         data = request.get_json()
@@ -84,19 +77,19 @@ def save_url():
 
     url = data.get("url") if data else None
 
-  
     if not url:
         logging.warning("No URL provided in request.")
         return jsonify({"error": "No URL provided"}), 400
 
     logging.info(f"Processing URL: {url}")
+    
     def extract_text(url):
         with open("article_text.pkl", "rb") as file:
             d = pickle.load(file)
         return d[url]
+    
     input_text = extract_text(url)
-    # print(f'Input text (first 30 characters) is {input_text[0:30]}')
-    f,pred = extract_features_from_article(input_text)
+    f, pred = extract_features_from_article(input_text)
     logging.debug("----------------------------------------------------------------------------------------")
     logging.debug(f"Extracted features: {f}")
     logging.debug(f"Prediction: {pred}")
@@ -105,7 +98,7 @@ def save_url():
     
     # print(f'Model Result: {pred}')
     
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
 
 
 
@@ -168,7 +161,9 @@ def save_url():
     logging.info(f"Confidence Score: {confidence_score}")
     logging.info(f"Confidence String: {confidence_string}")
 
-    global_resp_data = [
+    current_time = datetime.now()
+    
+    shared_response_data = [
         {
             "fake_percent": pred*100,  
             "fake_percent_display": confidence_string, 
@@ -184,65 +179,34 @@ def save_url():
         }
     ]
 
-    try:
-        with open("output_data.json", 'w') as file:
-            json.dump(global_resp_data, file, indent=4)
-            logging.info("Data successfully written to output_data.json.")
-    except Exception as e:
-        logging.error(f"An error occurred while writing to output_data.json: {e}")
-    
-    logging.debug("----------------------------------------------------------------------------------------")
-
-
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
-
-    with open("input_url.txt", "w") as file:
-        file.write(url)
-
-
     return jsonify({"message": "URL saved successfully"})
 
 @app.route('/get_output', methods=['GET'])
-
 def get_output():
-    logging.debug("Received request to get output data.")
-    try:
-        filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output_data.json')
-        logging.debug(f"Looking for file at: {filepath}")
-        
-        # Check if file exists
-        if not os.path.exists(filepath):
-            logging.warning(f"{datetime.now()} - output_data.json not found at {filepath}")
-            return jsonify({"error": "Data file not found"}), 404
-        
-        # Check file permissions
-        if not os.access(filepath, os.R_OK):
-            logging.warning(f"{datetime.now()} - Permission denied for {filepath}")
-            return jsonify({"error": "Cannot read data file"}), 403
-        
-        # Read and validate file
-        with open(filepath, 'r') as file:
-            data = json.load(file)
-            
-            # Validate data structure
-            if not isinstance(data, list) or len(data) == 0:
-                logging.error(f"{datetime.now()} - Invalid data format in file")
-                return jsonify({"error": "Invalid data format"}), 500
-                
-            if 'fake_percent' not in data[0]:
-                logging.error(f"{datetime.now()} - Missing required fields")
-                return jsonify({"error": "Missing data fields"}), 500
-                
-        logging.info("Successfully retrieved output data.")
-        return jsonify(data)
-        
-    except json.JSONDecodeError:
-        logging.error(f"{datetime.now()} - Invalid JSON in file")
-        return jsonify({"error": "Corrupted data file"}), 500
-    except Exception as e:
-        logging.error(f"{datetime.now()} - Unexpected error: {str(e)}")
-        return jsonify({"error": "Server error"}), 500
+    global shared_response_data  # Access the module-level variable
     
+    logging.debug("Received request to get output data.")
+    
+    if shared_response_data is None:
+        logging.warning("No data available yet")
+        return jsonify({"error": "No data available yet"}), 404
+        
+    try:
+        # Validate data structure
+        if not isinstance(shared_response_data, list) or len(shared_response_data) == 0:
+            logging.error("Invalid data format in shared data")
+            return jsonify({"error": "Invalid data format"}), 500
+            
+        if 'fake_percent' not in shared_response_data[0]:
+            logging.error("Missing required fields")
+            return jsonify({"error": "Missing data fields"}), 500
+            
+        logging.info("Successfully retrieved output data.")
+        return jsonify(shared_response_data)
+        
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Server error"}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
