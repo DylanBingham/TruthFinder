@@ -157,21 +157,66 @@ function createAvgSentenceSubjectivityChart(data, verticalLinePosition) {
             .attr("stroke-width", config.verticalLine.strokeWidth)
             .attr("stroke-dasharray", config.verticalLine.strokeDasharray);
 
+        // Append an invisible line on top (or behind) for capturing events
+        const hoverLine = verticalLineGroup.append("line")
+            .attr("class", "vertical-line-hover")
+            .attr("x1", x(config.verticalLine.position))
+            .attr("x2", x(config.verticalLine.position))
+            .attr("y1", 0)
+            .attr("y2", config.height)
+            .attr("stroke", "transparent")
+            .attr("stroke-width", 12)  
+            .style("pointer-events", "stroke");
+
+        // Create tooltip group (initially hidden)
+        const tooltip = svg.append("g")
+            .attr("class", "simple-tooltip")
+            .style("opacity", 0);
+        
+        // Add white background rectangle
+        tooltip.append("rect")
+            .attr("rx", 4)  // Slightly rounded corners
+            .attr("ry", 4)
+            .attr("fill", "white")
+            .attr("stroke", "#ccc")  // Light gray border
+            .attr("stroke-width", 1);
+        
+        // Add text
+        tooltip.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", "0.35em")
+            .style("font-size", "12px")
+            .style("fill", "#333");  // Dark gray text
+
         // Simplified tooltip
-        vLine.on("mouseover", function(event) {
+        hoverLine.on("mouseover", function(event) {
             const [_, mouseY] = d3.pointer(event, this);
+            const lineX = x(config.verticalLine.position);
             
-            svg.append("text")
-                .attr("class", "value-label")
-                .attr("x", x(config.verticalLine.position) + 5)
-                .attr("y", mouseY)
-                .text(`${percentile}% < ${verticalLinePosition.toFixed(2)}`)
-                .attr("font-size", "10px")
-                .attr("fill", "black");
+            // Update text
+            tooltip.select("text")
+                .text(`${percentile}% of values < ${verticalLinePosition}`);
+            
+            // Get text size
+            const textSize = tooltip.select("text").node().getBBox();
+            const padding = 8;
+            
+            // Position tooltip
+            tooltip.attr("transform", `translate(${lineX},${mouseY - 30})`);
+            
+            // Size background to fit text
+            tooltip.select("rect")
+                .attr("x", -textSize.width / 2 - padding)
+                .attr("y", -textSize.height / 2 - padding / 2)
+                .attr("width", textSize.width + padding * 2)
+                .attr("height", textSize.height + padding)
+                .attr("fill", "white")  // Set background color
+                .attr("stroke", "black") // Optional: Add a border
+                .attr("opacity", 1);  // Ensure it's fully visible
+            tooltip.raise()
+            tooltip.style("opacity", 1);
         })
-        .on("mouseout", function() {
-            svg.selectAll(".value-label").remove();
-        });
+        .on("mouseout", () => tooltip.style("opacity", 0));
     }
         
     // Simplified axes with meaningful ticks for subjectivity
