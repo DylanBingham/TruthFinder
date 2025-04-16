@@ -223,7 +223,7 @@ function createNumSpeechAttributesChart(data, verticalLinePosition) {
     // Add x axis
     svg.append("g")
         .attr("transform", `translate(0,${config.height})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).ticks(11));
     
     // Add y axis
     svg.append("g")
