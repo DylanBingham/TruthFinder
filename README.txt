@@ -37,7 +37,8 @@ At its core, TruthFinder is designed to empower users with the ability to critic
 ## EXECUTION
 1. Launch the application:
    - Start the backend server using `python app.py`.
-   - Visit the default local host of flask http://127.0.0.1:5000/
+   - Visit the default local host (it is recommended to use microsoft edge) of flask http://127.0.0.1:5000/
+    - If you have any errors you may want to check if the 5000 port is already occupied on your machine.
 
 2. Analyze an article:
    - Select an article from the dropdown menu or input a URL.
