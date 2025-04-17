@@ -12,7 +12,7 @@ At its core, TruthFinder is designed to empower users with the ability to critic
    cd TruthFinder
    ```
 
-   Or simply unzip the code into a local directoy.
+   Or simply unzip the code into a local directory.
 
 2. Install the required dependencies:
    - Ensure you have Python 3.8+ installed.
@@ -36,8 +36,8 @@ At its core, TruthFinder is designed to empower users with the ability to critic
 
 ## EXECUTION
 1. Launch the application:
-   - Start the backend server using `python app.py`.
-   - Visit the default local host (it is recommended to use microsoft edge) of flask http://127.0.0.1:5000/
+   - Start the backend server by typing `python app.py` into your terminal from the root directory of the project.
+   - Visit the default local host (it is recommended to use microsoft edge at 100% zoom) of flask http://127.0.0.1:5000/
     - If you have any errors you may want to check if the 5000 port is already occupied on your machine.
 
 2. Analyze an article:
@@ -45,7 +45,7 @@ At its core, TruthFinder is designed to empower users with the ability to critic
    - Click the "Save" button to analyze the article.
 
 3. View results:
-   - The analysis results, including metrics and visualizations, will be displayed in the output section.
+   - The analysis results, including metrics and visualizations, will be displayed in the "Analysis Results" section.
 
 4. Explore visualizations:
    - Interact with the charts to understand the article's credibility, sentiment, and subjectivity.
