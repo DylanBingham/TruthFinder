@@ -16,10 +16,10 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
         kdePoints: 500,
         verticalLine: {
             position: verticalLinePosition,
-            color: "#FF5733",
+            color: "#000000",
             strokeWidth: 2,
             strokeDasharray: "5,5",
-            hoverColor: "#FF0000"
+            hoverColor: "#000000"
         }
     };
     // Filter and parse data
@@ -28,16 +28,19 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
         .map(d => +d.overall_subjectivity)
         .filter(d => !isNaN(d));
     filteredData.sort((a, b) => a - b);
+    console.log('The minimum in ovr_subj is ', Math.min(...filteredData))
 
     // Also, split the data into two groups based on the binary_label
     const dataLabel0 = data
         .filter(d => +d.binary_label === 0)
         .map(d => +d.overall_subjectivity)
         .filter(d => !isNaN(d));
+    console.log('The minimum in ovr_subj with label = 0 is ', Math.min(...dataLabel0))
     const dataLabel1 = data
         .filter(d => +d.binary_label === 1)
         .map(d => +d.overall_subjectivity)
         .filter(d => !isNaN(d));
+    console.log('The minimum in ovr_subj with label = 1 is ', Math.min(...dataLabel1))
 
     
     // Create SVG
@@ -69,8 +72,8 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
             .attr("height", config.height);
     }    
     // Set up scales
-    const x = d3.scaleLog()
-        .domain([d3.min(filteredData), 1])
+    const x = d3.scaleLinear()
+        .domain([0, 1])
         .range([0, config.width]);
     
     // Create histogram generator
@@ -95,7 +98,7 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
     const maxKDE1 = d3.max(kdeData1, d => d[1]);
     
     // Unify the y-scale: use the larger of the histogram max and KDE max
-    const yDomainMax = Math.max(maxHistogram, maxKDE0, maxKDE1);
+    const yDomainMax = Math.max(maxKDE0, maxKDE1);
     const y = d3.scaleLinear()
         .domain([0, yDomainMax])
         .range([config.height, 0]);
@@ -162,6 +165,17 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
             .attr("stroke-width", config.verticalLine.strokeWidth)
             .attr("stroke-dasharray", config.verticalLine.strokeDasharray);
 
+        // Append an invisible line on top (or behind) for capturing events
+        const hoverLine = verticalLineGroup.append("line")
+            .attr("class", "vertical-line-hover")
+            .attr("x1", x(config.verticalLine.position))
+            .attr("x2", x(config.verticalLine.position))
+            .attr("y1", 0)
+            .attr("y2", config.height)
+            .attr("stroke", "transparent")
+            .attr("stroke-width", 12)  
+            .style("pointer-events", "stroke");
+
         // Create tooltip group (initially hidden)
         const tooltip = svg.append("g")
             .attr("class", "simple-tooltip")
@@ -183,7 +197,7 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
             .style("fill", "#333");  // Dark gray text
         
         // Update hover interactions
-        vLine.on("mouseover", function(event) {
+        hoverLine.on("mouseover", function(event) {
             const [_, mouseY] = d3.pointer(event, this);
             const lineX = x(config.verticalLine.position);
             
@@ -229,7 +243,7 @@ function createOverallSubjectivityChart(data, verticalLinePosition) {
         .attr("x", config.width / 2)
         .attr("y", config.height + config.margin.bottom - 10)
         .style("text-anchor", "middle")
-        .text("Subjectivity Score (0 to 1) (Log-Scaled)");
+        .text("Subjectivity Score (0 to 1)");
     
     // Add y axis label
     svg.append("text")

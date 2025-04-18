@@ -15,10 +15,10 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
         kdePoints: 500,
         verticalLine: {
             position: verticalLinePosition,
-            color: "#FF5733",
+            color: "#000000",
             strokeWidth: 2,
             strokeDasharray: "5,5",
-            hoverColor: "#FF0000"
+            hoverColor: "#000000"
         }
     };
 
@@ -94,7 +94,7 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
     const maxKDE1 = d3.max(kdeData1, d => d[1]);
     
     // Unify the y-scale: use the larger of the histogram max and KDE max
-    const yDomainMax = Math.max(maxHistogram, maxKDE0, maxKDE1);
+    const yDomainMax = Math.max(maxKDE0, maxKDE1);
     const y = d3.scaleLinear()
         .domain([0, yDomainMax])
         .range([config.height, 0]);
@@ -160,6 +160,17 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
             .attr("stroke", config.verticalLine.color)
             .attr("stroke-width", config.verticalLine.strokeWidth)
             .attr("stroke-dasharray", config.verticalLine.strokeDasharray);
+        
+        // Append an invisible line on top (or behind) for capturing events
+        const hoverLine = verticalLineGroup.append("line")
+            .attr("class", "vertical-line-hover")
+            .attr("x1", x(config.verticalLine.position))
+            .attr("x2", x(config.verticalLine.position))
+            .attr("y1", 0)
+            .attr("y2", config.height)
+            .attr("stroke", "transparent")
+            .attr("stroke-width", 12)  
+            .style("pointer-events", "stroke");
 
         // Create tooltip group (initially hidden)
         const tooltip = svg.append("g")
@@ -182,7 +193,7 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
             .style("fill", "#333");  // Dark gray text
         
         // Update hover interactions
-        vLine.on("mouseover", function(event) {
+        hoverLine.on("mouseover", function(event) {
             const [_, mouseY] = d3.pointer(event, this);
             const lineX = x(config.verticalLine.position);
             
@@ -236,6 +247,7 @@ const container = d3.select("#flesch-reading-ease-chart .chart-svg-container");
         .attr("transform", "rotate(-90)")
         .attr("x", -config.height / 2)
         .attr("y", -config.margin.left + 15)
+        .attr("dy", "-1.0em")  // Adjust horizontal offset
         .style("text-anchor", "middle")
         .text("Density");
     

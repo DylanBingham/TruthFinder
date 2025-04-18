@@ -34,24 +34,24 @@
       display: flex;
       align-items: center;
       padding: 10px 10px;
-      padding-bottom: 5px;
+      padding-bottom: 0px;
       background-color: #ffffff;  /* White background to contrast with a light gray body */
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
       border-bottom: 1px solid #e0e0e0; /* Optional: a thin bottom border for separation */
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .logo {
-      height: 70px;      /* Adjust the height as needed */
+      height: 100px;      /* Adjust the height as needed */
       width: auto;       /* Maintain aspect ratio */
     }
 
     .app-title {
-      font-size: 1rem;
+      font-size: 3rem;
       font-weight: 600;
       color: #333;       /* Dark but neutral color */
       margin: 0;
-      margin-left: 10px;
+      margin-left: 20px;
       font-family: 'Montserrat', sans-serif; /* Modern, clean font - be sure to load it if using external fonts */
     }
 
@@ -502,7 +502,7 @@
       <!-- Replace the src value with the path to your logo image -->
       <img src="/static/truth_finder_logo.png" alt="Truth Finder Logo" class="logo">
     </div>
-    <h1 class="app-title">CSE-6242</h1>
+    <h1 class="app-title">Truth Finder</h1>
   </header>
 
   <!-- Fixed Information Button -->
@@ -557,7 +557,7 @@
 
   <!-- Floating legend container -->
   <div class="floating-legend">
-    <h4>Distribution Plots - Legend</h4>
+    <h4>Kernel Density Distribution Plots - Legend</h4>
     <div class="legend-item">
       <span class="legend-color green-line"></span>
       <span class="legend-label">True Articles</span>
@@ -579,7 +579,6 @@
        <option value="These are the House Republicans running for speaker"> These are the House Republicans running for speaker </option>
        <option value="Supreme Court says Trump admin must 'facilitate' release of man wrongly deported to El Salvador prison"> Supreme Court says Trump admin must 'facilitate' release of man wrongly deported to El Salvador prison </option>
        <option value="Michelle Obama addresses recent absences from political events and divorce rumors"> Michelle Obama addresses recent absences from political events and divorce rumors </option>
-       <option value="These are the House Republicans running for speaker"> These are the House Republicans running for speaker </option>
        <option value="Uncertainty looms for future aid to Ukraine and Israel as speaker drama continues"> Uncertainty looms for future aid to Ukraine and Israel as speaker drama continues </option>
        <option value="Can Trump run for a third term in 2028?"> Can Trump run for a third term in 2028? </option>
        <option value="Top federal labor officials reinstated by full DC federal appeals court "> Top federal labor officials reinstated by full DC federal appeals court </option>
@@ -711,62 +710,6 @@
         });
          
         document.getElementById("metricsDisplay").innerHTML = `
-              <div class="metric-card">
-                  <h4>Avg. Polarity</h4>
-                  <div class="metric-value">${result.avg_polarity}</div>
-                      <div id="avg-sentence-polarity-chart" class="chart-container">
-                        <!-- Scale container (won't be cleared by D3) -->
-                        <div class="subjectivity-scale">
-                          <div class="scale-track"></div>
-                          <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
-                            <div class="indicator-line"></div>
-                            <div class="indicator-dot"></div>
-                          </div>
-                          <div class="scale-label scale-label-0">-1</div>
-                          <div class="scale-label scale-label-1">1</div>
-                          <div class="scale-label scale-label-min" data-tooltip="Completely Negative">
-                              -1
-                          </div>
-                          <div class="scale-label scale-label-max" data-tooltip="Completely Positive">
-                              1
-                          </div>
-                          <div class="scale-instruction">Hover over ends of scale</div>
-                        </div>
-                        <!-- Chart will be inserted here -->
-                        <div class="chart-svg-container"></div>
-                      </div>
-                  <span class="tooltip">The overall polarity (sentiment) of an article as a whole. Completely Negative = -1, Completely Positive = 1.</span>
-              </div>
-                                  
-              <div class="metric-card">
-                  <h4>Avg. Subjectivity</h4>
-                  <div class="metric-value">${result.avg_subjectivity}</div>
-                  <div id="avg-sentence-subjectivity-chart" class="chart-container">
-                      <!-- Scale container -->
-                      <div class="subjectivity-scale">
-                          <!-- The scale track - blue gradient for objectivity/subjectivity -->
-                          <div class="scale-track"></div>
-                          
-                          <!-- The indicator for the current value -->
-                          <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
-                            <div class="indicator-line"></div>
-                            <div class="indicator-dot"></div>
-                          </div>
-                          <div class="scale-label scale-label-0">0</div>
-                          <div class="scale-label scale-label-1">1</div>
-                          <div class="scale-label scale-label-min" data-tooltip="More Factual Content">
-                              0
-                          </div>
-                          <div class="scale-label scale-label-max" data-tooltip="More Opinionated Content">
-                              1
-                          </div>
-                          <div class="scale-instruction">Hover over ends of scale</div>
-                        </div>
-                        <!-- Chart will be inserted here -->
-                        <div class="chart-svg-container"></div>
-                  </div>
-                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
-              </div>
               
               <div class="metric-card">
                   <h4>Polarity Score</h4>
@@ -825,9 +768,66 @@
                         <!-- Chart will be inserted here -->
                         <div class="chart-svg-container"></div>
                   </div>
-                  <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity.</span>
+                  <span class="tooltip">The overall subjectivity (how much or how little an article expresses a personal viewpoint) of an article as a whole. More Factual Content = 0, More Opinionated Content = 1.</span>
               </div>
-              
+
+              <div class="metric-card">
+                  <h4>Avg. Polarity</h4>
+                  <div class="metric-value">${result.avg_polarity}</div>
+                      <div id="avg-sentence-polarity-chart" class="chart-container">
+                        <!-- Scale container (won't be cleared by D3) -->
+                        <div class="subjectivity-scale">
+                          <div class="scale-track"></div>
+                          <div class="scale-indicator" style="left: ${(result.avg_polarity * 100+50)}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">-1</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="Completely Negative">
+                              -1
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="Completely Positive">
+                              1
+                          </div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                      </div>
+                  <span class="tooltip">The average polarity (sentiment) of an article's sentences. A more fine-grained measure of polarity. Completely Negative = -1, Completely Positive = 1.</span>
+              </div>
+                                  
+              <div class="metric-card">
+                  <h4>Avg. Subjectivity</h4>
+                  <div class="metric-value">${result.avg_subjectivity}</div>
+                  <div id="avg-sentence-subjectivity-chart" class="chart-container">
+                      <!-- Scale container -->
+                      <div class="subjectivity-scale">
+                          <!-- The scale track - blue gradient for objectivity/subjectivity -->
+                          <div class="scale-track"></div>
+                          
+                          <!-- The indicator for the current value -->
+                          <div class="scale-indicator" style="left: ${result.avg_subjectivity * 100}%;">
+                            <div class="indicator-line"></div>
+                            <div class="indicator-dot"></div>
+                          </div>
+                          <div class="scale-label scale-label-0">0</div>
+                          <div class="scale-label scale-label-1">1</div>
+                          <div class="scale-label scale-label-min" data-tooltip="More Factual Content">
+                              0
+                          </div>
+                          <div class="scale-label scale-label-max" data-tooltip="More Opinionated Content">
+                              1
+                          </div>
+                          <div class="scale-instruction">Hover over ends of scale</div>
+                        </div>
+                        <!-- Chart will be inserted here -->
+                        <div class="chart-svg-container"></div>
+                  </div>
+                  <span class="tooltip">The average subjectivity of the article's sentences. A more fine-grained measure of subjectivity. More Factual Content = 0, More Opinionated Content = 1</span>
+              </div>
+
               <div class="metric-card">
                   <h4>Quotes Count</h4>
                   <div class="metric-value">${result.num_quotes}</div>
@@ -836,6 +836,7 @@
                   </div>
                   <span class="tooltip">An approximation of the number of quotations in an article. Counts number of times "said", "say", "told", and "tell" speech attributes appear in the article.</span>
               </div>
+              
               <div class="metric-card">
                   <h4>Word Count</h4>
                   <div class="metric-value">${result.word_count}</div>
@@ -845,6 +846,7 @@
                   </div>
                   <span class="tooltip">The length of an article.</span>
               </div>
+
               <div class="metric-card">
                   <h4>Readability</h4>
                   <div class="metric-value">${result.flesch_reading_ease}</div>
